@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.ZonedDateTime;
+import java.util.List;
 
 @Data // Generates getters and setters
 @NoArgsConstructor
@@ -25,7 +26,8 @@ public class DrinkingFountainEntity {
     private ZonedDateTime createdAt;
     private boolean approved;
     private double score;
-
+    @OneToMany(mappedBy = "drinkingFountainEntity")
+    private List<FountainImageEntity> fountainImageEntities;
     public enum FountainType {
         FILLING, DRINKING
     }
