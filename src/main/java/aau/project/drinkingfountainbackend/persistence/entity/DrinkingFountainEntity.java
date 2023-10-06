@@ -10,9 +10,8 @@ import java.time.ZonedDateTime;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "drinking_fountain")
+@Table(name = "drinking_fountains")
 public class DrinkingFountainEntity {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "drinking_fountain_id")
