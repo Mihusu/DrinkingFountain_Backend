@@ -5,6 +5,7 @@ import java.time.ZonedDateTime;
 import java.util.List;
 
 public record DrinkingFountainDTO(
+        int id,
         double latitude,
         double longitude,
         DrinkingFountainEntity.FountainType type,

@@ -2,14 +2,13 @@ package aau.project.drinkingfountainbackend.service;
 
 import aau.project.drinkingfountainbackend.api.dto.*;
 import aau.project.drinkingfountainbackend.persistence.entity.DrinkingFountainEntity;
-import aau.project.drinkingfountainbackend.persistence.entity.DrinkingFountainImageEntity;
 import aau.project.drinkingfountainbackend.persistence.projection.DrinkingFountainMapProjection;
 import aau.project.drinkingfountainbackend.persistence.repository.DrinkingFountainRepository;
+import aau.project.drinkingfountainbackend.util.Base64Utility;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.ZonedDateTime;
-import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -59,32 +58,35 @@ public class DrinkingFountainService {
     }
 
     private DrinkingFountainDTO drinkingFountainDTOMapper (DrinkingFountainEntity entity){
-        List<DrinkingFountainImageEntity> images = entity.getFountainImageEntities();
+        List<ReviewDTO> reviewDTOS =  entity.getReviewEntities().stream().map(reviewEntity -> {
 
-        List<FountainImageDTO> fountainImageDTOS = images.stream().map(
+                List<ReviewImageDTO> reviewImages = reviewEntity.getReviewImageEntities().stream().map(
+                        reviewImageEntity -> new ReviewImageDTO(Base64Utility.encode(reviewImageEntity.getImage()))).toList();
+
+            return new ReviewDTO(
+                    reviewEntity.getText(),
+                    reviewEntity.getStars(),
+                    reviewImages,
+                    "test",
+                    reviewEntity.getType(),
+                    reviewEntity.getCreatedAt());
+        }).toList();
+
+        List<FountainImageDTO> fountainImageDTOS = entity.getFountainImageEntities().stream().map(
                         //Turn each entity into a DTO
                         image -> new FountainImageDTO(
                                 //From byte[] to base64 String
-                                Base64.getEncoder().encodeToString(image.getImage())))
-                .collect(Collectors.toList());
-
-        List<ReviewDTO> reviewDTOS =  entity.getReviewEntities().stream().map(
-                reviewEntity -> new ReviewDTO(
-                        reviewEntity.getText(),
-                        reviewEntity.getStars(),
-                        reviewEntity.getReviewImageEntities(),
-                        "test",
-                        reviewEntity.getType(),
-                        reviewEntity.getCreatedAt()
+                                Base64Utility.encode(image.getImage())
                         )).collect(Collectors.toList());
 
         return new DrinkingFountainDTO(
+                entity.getId(),
                 entity.getLatitude(),
                 entity.getLongitude(),
                 entity.getType(),
                 entity.getCreatedAt(),
                 entity.getScore(),
                 fountainImageDTOS,
-                entity.getReviewEntities());
+                reviewDTOS);
     }
 }
