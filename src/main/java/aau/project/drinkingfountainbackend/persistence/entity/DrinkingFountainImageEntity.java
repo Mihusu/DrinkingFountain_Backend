@@ -14,7 +14,7 @@ import java.time.ZonedDateTime;
 @Builder
 @Entity
 @Table(name = "fountain_images")
-public class FountainImageEntity {
+public class DrinkingFountainImageEntity {
     @Id
     @Column(name = "fountain_images_id")
     private int id;

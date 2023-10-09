@@ -27,7 +27,7 @@ public class DrinkingFountainEntity {
     private boolean approved;
     private double score;
     @OneToMany(mappedBy = "drinkingFountainEntity")
-    private List<FountainImageEntity> fountainImageEntities;
+    private List<DrinkingFountainImageEntity> fountainImageEntities;
     public enum FountainType {
         FILLING, DRINKING
     }
