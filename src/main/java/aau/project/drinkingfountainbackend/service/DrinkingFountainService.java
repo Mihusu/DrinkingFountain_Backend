@@ -1,9 +1,6 @@
 package aau.project.drinkingfountainbackend.service;
 
-import aau.project.drinkingfountainbackend.api.dto.DrinkingFountainDTO;
-import aau.project.drinkingfountainbackend.api.dto.DrinkingFountainMapDTO;
-import aau.project.drinkingfountainbackend.api.dto.DrinkingFountainRequestDTO;
-import aau.project.drinkingfountainbackend.api.dto.FountainImageDTO;
+import aau.project.drinkingfountainbackend.api.dto.*;
 import aau.project.drinkingfountainbackend.persistence.entity.DrinkingFountainEntity;
 import aau.project.drinkingfountainbackend.persistence.entity.DrinkingFountainImageEntity;
 import aau.project.drinkingfountainbackend.persistence.projection.DrinkingFountainMapProjection;
@@ -71,12 +68,23 @@ public class DrinkingFountainService {
                                 Base64.getEncoder().encodeToString(image.getImage())))
                 .collect(Collectors.toList());
 
+        List<ReviewDTO> reviewDTOS =  entity.getReviewEntities().stream().map(
+                reviewEntity -> new ReviewDTO(
+                        reviewEntity.getText(),
+                        reviewEntity.getStars(),
+                        reviewEntity.getReviewImageEntities(),
+                        "test",
+                        reviewEntity.getType(),
+                        reviewEntity.getCreatedAt()
+                        )).collect(Collectors.toList());
+
         return new DrinkingFountainDTO(
                 entity.getLatitude(),
                 entity.getLongitude(),
                 entity.getType(),
                 entity.getCreatedAt(),
                 entity.getScore(),
-                fountainImageDTOS);
+                fountainImageDTOS,
+                entity.getReviewEntities());
     }
 }

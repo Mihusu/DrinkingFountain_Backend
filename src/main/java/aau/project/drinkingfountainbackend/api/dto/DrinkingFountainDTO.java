@@ -10,5 +10,6 @@ public record DrinkingFountainDTO(
         DrinkingFountainEntity.FountainType type,
         ZonedDateTime createdAt,
         double score,
-        List<FountainImageDTO> fountainImages) {
+        List<FountainImageDTO> fountainImages,
+        List<ReviewDTO> reviews) {
 }
