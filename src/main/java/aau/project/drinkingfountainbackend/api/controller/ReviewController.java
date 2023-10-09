@@ -23,14 +23,4 @@ public class ReviewController {
         this.reviewService = reviewService;
     }
 
-    @GetMapping("{id}")
-    public ResponseEntity<List<ReviewDTO>> getReviews(@PathVariable int id) {
-        List<ReviewDTO> reviews = reviewService.getReviews(id);
-
-        if (!reviews.isEmpty()) {
-            return new ResponseEntity<>(reviews, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-    }
 }
