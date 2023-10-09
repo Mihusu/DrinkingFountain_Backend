@@ -8,7 +8,7 @@ public record ReviewDTO (
         String text,
         int stars,
         List<ReviewImageDTO> fountainImages,
-        String username,
         DrinkingFountainEntity.FountainType type,
+        String username,
         ZonedDateTime createdAt) {
 }

@@ -89,4 +89,8 @@ public class DrinkingFountainService {
                 fountainImageDTOS,
                 reviewDTOS);
     }
+
+    public Optional<DrinkingFountainEntity> getDrinkingFountainEntity(int i) {
+        return drinkingFountainRepository.findById(i);
+    }
 }
