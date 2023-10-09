@@ -10,7 +10,7 @@ import java.util.Optional;
 @Service
 public class LoginService {
 
-    UserRepository userRepository;
+    private final UserRepository userRepository;
 
     @Autowired
     public LoginService(UserRepository userRepository) {
