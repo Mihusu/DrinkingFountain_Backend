@@ -33,9 +33,10 @@ public class DrinkingFountainService {
             List<FountainImageEntity> images = entity.getFountainImageEntities();
 
             List<FountainImageDTO> fountainImageDTOS = images.stream().map(
-                    //Turn each entity into a DTO
+                    // Turn each entity into a DTO
+                    // A function that takes a stream of image entities, make a DTO then takes a bytearray, encodes from byte[] to base64 string
                     image -> new FountainImageDTO(
-                            //From byte[] to base64 String
+                            // From byte[] to base64 String
                             Base64.getEncoder().encodeToString(image.getImage())))
                     .collect(Collectors.toList());
 
