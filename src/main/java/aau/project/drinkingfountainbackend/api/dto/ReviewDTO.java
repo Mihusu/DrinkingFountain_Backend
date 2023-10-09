@@ -10,7 +10,6 @@ public record ReviewDTO (
         int stars,
         List<FountainImageDTO> fountainImages,
         DrinkingFountainEntity.FountainType type,
-        UserEntity userEntity,
-        DrinkingFountainEntity drinkingFountainEntity,
+        String username,
         ZonedDateTime createdAt) {
 }

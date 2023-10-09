@@ -16,6 +16,7 @@ import java.time.ZonedDateTime;
 @Table(name = "fountain_images")
 public class FountainImageEntity {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "fountain_images_id")
     private int id;
     private byte[] image;

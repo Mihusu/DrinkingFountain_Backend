@@ -17,6 +17,7 @@ import java.util.List;
 @Table(name = "reviews")
 public class ReviewEntity {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "review_id")
     private int id;
     private String text;
