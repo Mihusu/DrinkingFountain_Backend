@@ -6,5 +6,6 @@ public record DrinkingFountainRequestDTO(
         double latitude,
         double longitude,
         DrinkingFountainEntity.FountainType type,
-        double score) {
+        double score,
+        String base64Images) {
 }

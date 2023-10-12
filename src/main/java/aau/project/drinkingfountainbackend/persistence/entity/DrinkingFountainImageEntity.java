@@ -24,5 +24,5 @@ public class DrinkingFountainImageEntity {
     private ZonedDateTime createdAt;
     @ManyToOne
     @JoinColumn(name="drinking_fountain_id", nullable=false)
-    private DrinkingFountainEntity drinkingFountainEntity;
+    private DrinkingFountainEntity drinkingFountain;
 }
