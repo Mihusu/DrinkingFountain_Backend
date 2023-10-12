@@ -30,9 +30,8 @@ public class DrinkingFountainEntity {
     private List<DrinkingFountainImageEntity> fountainImageEntities;
     @OneToMany(mappedBy = "drinkingFountain")
     private List<ReviewEntity> reviewEntities;
+
     public enum FountainType {
         FILLING, DRINKING
     }
 }
-
-
