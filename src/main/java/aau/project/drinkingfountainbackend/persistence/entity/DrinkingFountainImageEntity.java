@@ -14,7 +14,7 @@ import java.time.ZonedDateTime;
 @Builder
 @Entity
 @Table(name = "fountain_images")
-public class FountainImageEntity {
+public class DrinkingFountainImageEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "fountain_images_id")
@@ -24,5 +24,5 @@ public class FountainImageEntity {
     private ZonedDateTime createdAt;
     @ManyToOne
     @JoinColumn(name="drinking_fountain_id", nullable=false)
-    private DrinkingFountainEntity drinkingFountainEntity;
+    private DrinkingFountainEntity drinkingFountain;
 }

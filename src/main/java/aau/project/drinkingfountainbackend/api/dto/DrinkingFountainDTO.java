@@ -5,10 +5,12 @@ import java.time.ZonedDateTime;
 import java.util.List;
 
 public record DrinkingFountainDTO(
+        int id,
         double latitude,
         double longitude,
         DrinkingFountainEntity.FountainType type,
         ZonedDateTime createdAt,
         double score,
-        List<FountainImageDTO> fountainImages) {
+        List<FountainImageDTO> fountainImages,
+        List<ReviewDTO> reviews) {
 }
