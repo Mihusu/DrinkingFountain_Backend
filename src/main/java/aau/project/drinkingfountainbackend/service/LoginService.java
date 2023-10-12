@@ -33,11 +33,24 @@ public class LoginService {
                 .name(userDTO.userName())
                 .password(hashedPassword)
                 .createdAt(ZonedDateTime.now())
-                .roleType(userDTO.role())
+                .role(UserEntity.RoleType.valueOf(UserEntity.RoleType.USER.name()))
                 .build();
 
         userRepository.save(userEntity);
     }
 
+    public boolean login(UserDTO userDTO) {
+        Optional<UserEntity> userEntity = userRepository.findFirstByName(userDTO.userName());
 
+        if (userEntity.isEmpty()) {
+            return false;
+        }
+
+        // Verify user exists and check if password match
+        return userEntity.filter(entity -> checkPassword(userDTO.password(), entity.getPassword())).isPresent();
+    }
+
+    private boolean checkPassword(String inputPassword, String dataBasePassword){
+        return BCrypt.checkpw(inputPassword, dataBasePassword);
+    }
 }
