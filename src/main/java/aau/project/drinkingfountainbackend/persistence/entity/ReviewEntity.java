@@ -17,12 +17,13 @@ import java.util.List;
 @Table(name = "reviews")
 public class ReviewEntity {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "review_id")
     private int id;
     private String text;
     private int stars;
-    @OneToMany(mappedBy = "reviewEntity")
-    private List<ReviewImageEntity> reviewImageEntities;
+    @OneToMany(mappedBy = "review", cascade = CascadeType.ALL)
+    private List<ReviewImageEntity> reviewImages;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "fountain_type")
@@ -33,8 +34,8 @@ public class ReviewEntity {
     private UserEntity userEntity;
 
     @ManyToOne
-    @JoinColumn(name="drinking_fountain_id", nullable=false)
-    private DrinkingFountainEntity drinkingFountainEntity;
+    @JoinColumn(name = "drinking_fountain_id", nullable = false)
+    private DrinkingFountainEntity drinkingFountain;
 
     @Column(name = "created_at")
     private ZonedDateTime createdAt;

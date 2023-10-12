@@ -13,15 +13,16 @@ import java.time.ZonedDateTime;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "fountain_images")
+@Table(name = "review_images")
 public class ReviewImageEntity {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "review_images_id")
     private int id;
     private byte[] image;
     @Column(name = "created_at")
     private ZonedDateTime createdAt;
     @ManyToOne
-    @JoinColumn(name="review_id", nullable=false)
-    private ReviewEntity reviewEntity;
+    @JoinColumn(name = "review_id", nullable = false)
+    private ReviewEntity review;
 }

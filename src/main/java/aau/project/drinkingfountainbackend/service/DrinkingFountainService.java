@@ -63,4 +63,8 @@ public class DrinkingFountainService {
                 .build()
         );
     }
+
+    public Optional<DrinkingFountainEntity> getDrinkingFountainEntity(int i) {
+        return drinkingFountainRepository.findById(i);
+    }
 }

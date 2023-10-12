@@ -11,5 +11,5 @@ import java.util.Optional;
 
 @Repository
 public interface ReviewRepository extends JpaRepository<ReviewEntity, Integer>  {
-    List<ReviewEntity> getAllById(int id);
+
 }
