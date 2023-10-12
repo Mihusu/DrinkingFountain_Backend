@@ -21,6 +21,12 @@ public class UserEntity {
     private int id;
     private String name;
     private String password;
+    @Column(name = "role")
+    private RoleType role;
     @Column(name = "created_at")
     private ZonedDateTime createdAt;
+
+    public enum RoleType {
+        USER, ADMIN
+    }
 }
