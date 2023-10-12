@@ -1,4 +1,4 @@
-    package aau.project.drinkingfountainbackend.api.controller;
+package aau.project.drinkingfountainbackend.api.controller;
 
 import aau.project.drinkingfountainbackend.api.dto.DrinkingFountainMapDTO;
 import aau.project.drinkingfountainbackend.api.dto.DrinkingFountainRequestDTO;
