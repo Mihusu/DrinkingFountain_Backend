@@ -26,11 +26,12 @@ public class DrinkingFountainEntity {
     private ZonedDateTime createdAt;
     private boolean approved;
     private double score;
-    @OneToMany(mappedBy = "drinkingFountainEntity")
-    private List<FountainImageEntity> fountainImageEntities;
+    @OneToMany(mappedBy = "drinkingFountain")
+    private List<DrinkingFountainImageEntity> fountainImageEntities;
+    @OneToMany(mappedBy = "drinkingFountain")
+    private List<ReviewEntity> reviewEntities;
+
     public enum FountainType {
         FILLING, DRINKING
     }
 }
-
-

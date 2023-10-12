@@ -4,13 +4,11 @@ import aau.project.drinkingfountainbackend.persistence.entity.DrinkingFountainEn
 import java.time.ZonedDateTime;
 import java.util.List;
 
-public record DrinkingFountainDTO(
-        int id,
-        double latitude,
-        double longitude,
+public record ReviewDTO (
+        String text,
+        int stars,
+        List<ReviewImageDTO> fountainImages,
         DrinkingFountainEntity.FountainType type,
-        ZonedDateTime createdAt,
-        double score,
-        List<FountainImageDTO> fountainImages,
-        List<ReviewDTO> reviews) {
+        String username,
+        ZonedDateTime createdAt) {
 }

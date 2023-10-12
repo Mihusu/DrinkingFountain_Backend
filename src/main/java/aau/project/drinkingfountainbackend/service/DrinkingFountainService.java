@@ -1,16 +1,17 @@
 package aau.project.drinkingfountainbackend.service;
 
-import aau.project.drinkingfountainbackend.api.dto.DrinkingFountainDTO;
-import aau.project.drinkingfountainbackend.api.dto.DrinkingFountainRequestDTO;
-import aau.project.drinkingfountainbackend.api.dto.FountainImageDTO;
+import aau.project.drinkingfountainbackend.api.dto.*;
 import aau.project.drinkingfountainbackend.persistence.entity.DrinkingFountainEntity;
-import aau.project.drinkingfountainbackend.persistence.entity.FountainImageEntity;
+import aau.project.drinkingfountainbackend.persistence.entity.DrinkingFountainImageEntity;
+import aau.project.drinkingfountainbackend.persistence.projection.DrinkingFountainMapProjection;
+import aau.project.drinkingfountainbackend.persistence.repository.DrinkingFountainImageRepository;
 import aau.project.drinkingfountainbackend.persistence.repository.DrinkingFountainRepository;
+import aau.project.drinkingfountainbackend.util.Base64Utility;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.ZonedDateTime;
-import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -18,40 +19,30 @@ import java.util.stream.Collectors;
 @Service
 public class DrinkingFountainService {
 
-    DrinkingFountainRepository drinkingFountainRepository;
+    private final DrinkingFountainRepository drinkingFountainRepository;
+    private final DrinkingFountainImageRepository drinkingFountainImageRepository;
 
     @Autowired
-    public DrinkingFountainService(DrinkingFountainRepository drinkingFountainRepository) {
+    public DrinkingFountainService(DrinkingFountainRepository drinkingFountainRepository, DrinkingFountainImageRepository drinkingFountainImageRepository) {
         this.drinkingFountainRepository = drinkingFountainRepository;
+        this.drinkingFountainImageRepository = drinkingFountainImageRepository;
     }
 
     public Optional<DrinkingFountainDTO> getDrinkingFountain(int id){
-        Optional<DrinkingFountainEntity> drinkingFountainEntity = drinkingFountainRepository.getFirstById(id);
-
-        return drinkingFountainEntity.flatMap(entity -> {
-
-            List<FountainImageEntity> images = entity.getFountainImageEntities();
-
-            List<FountainImageDTO> fountainImageDTOS = images.stream().map(
-                    //Turn each entity into a DTO
-                    image -> new FountainImageDTO(
-                            //From byte[] to base64 String
-                            Base64.getEncoder().encodeToString(image.getImage())))
-                    .collect(Collectors.toList());
-
-            return Optional.of(
-                    new DrinkingFountainDTO(
-                            entity.getLatitude(),
-                            entity.getLongitude(),
-                            entity.getType(),
-                            entity.getCreatedAt(),
-                            entity.getScore(),
-                            fountainImageDTOS));
-        });
+        Optional<DrinkingFountainEntity> drinkingFountainEntity = drinkingFountainRepository.getFirstByIdAndApproved(id, true);
+        return drinkingFountainEntity.flatMap(entity -> Optional.of(drinkingFountainDTOMapper(entity)));
     }
 
+    public List<DrinkingFountainMapDTO> getDrinkingFountainMapData(){
+        List<DrinkingFountainMapProjection> drinkingFountainMapProjections = drinkingFountainRepository.findAllByApprovedMapped(true);
+        return drinkingFountainMapProjections.stream().map(
+                entity -> new DrinkingFountainMapDTO(entity.getId(),entity.getLatitude(), entity.getLongitude())
+        ).collect(Collectors.toList());
+    }
+
+    @Transactional
     public void saveDrinkingFountainRequest(DrinkingFountainRequestDTO drinkingFountainRequestDTO) {
-        drinkingFountainRepository.save(DrinkingFountainEntity.builder()
+        DrinkingFountainEntity savedDrinkingFountain = drinkingFountainRepository.save(DrinkingFountainEntity.builder()
                 .latitude(drinkingFountainRequestDTO.latitude())
                 .longitude(drinkingFountainRequestDTO.longitude())
                 .type(drinkingFountainRequestDTO.type())
@@ -61,5 +52,56 @@ public class DrinkingFountainService {
                 .score(drinkingFountainRequestDTO.score())
                 .build()
         );
+
+        drinkingFountainImageRepository.save(DrinkingFountainImageEntity.builder()
+                        .drinkingFountain(savedDrinkingFountain)
+                        .image(Base64Utility.decode(drinkingFountainRequestDTO.base64Images()))
+                        .createdAt(ZonedDateTime.now())
+                .build());
+    }
+
+    public void approveDrinkingFountain(int id) {
+        drinkingFountainRepository.approveById(id);
+    }
+
+    public List<DrinkingFountainDTO> getUnapprovedDrinkingFountains() {
+        List<DrinkingFountainEntity> unapproved = drinkingFountainRepository.findAllByApprovedEntity(false);
+        return unapproved.stream().map(this::drinkingFountainDTOMapper).collect(Collectors.toList());
+    }
+
+    private DrinkingFountainDTO drinkingFountainDTOMapper (DrinkingFountainEntity entity){
+        List<ReviewDTO> reviewDTOS =  entity.getReviewEntities().stream().map(reviewEntity -> {
+                List<ReviewImageDTO> reviewImages = reviewEntity.getReviewImages().stream().map(
+                        reviewImageEntity -> new ReviewImageDTO(Base64Utility.encode(reviewImageEntity.getImage()))).toList();
+
+            return new ReviewDTO(
+                    reviewEntity.getText(),
+                    reviewEntity.getStars(),
+                    reviewImages,
+                    reviewEntity.getType(),
+                    "test",
+                    reviewEntity.getCreatedAt());
+        }).toList();
+
+        List<FountainImageDTO> fountainImageDTOS = entity.getFountainImageEntities().stream().map(
+                        //Turn each entity into a DTO
+                        image -> new FountainImageDTO(
+                                //From byte[] to base64 String
+                                Base64Utility.encode(image.getImage())
+                        )).collect(Collectors.toList());
+
+        return new DrinkingFountainDTO(
+                entity.getId(),
+                entity.getLatitude(),
+                entity.getLongitude(),
+                entity.getType(),
+                entity.getCreatedAt(),
+                entity.getScore(),
+                fountainImageDTOS,
+                reviewDTOS);
+    }
+
+    public Optional<DrinkingFountainEntity> getDrinkingFountainEntity(int i) {
+        return drinkingFountainRepository.findById(i);
     }
 }
