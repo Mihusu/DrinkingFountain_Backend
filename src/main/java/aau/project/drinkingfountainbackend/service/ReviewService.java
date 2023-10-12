@@ -5,6 +5,7 @@ import aau.project.drinkingfountainbackend.api.dto.ReviewRequestDTO;
 import aau.project.drinkingfountainbackend.persistence.entity.*;
 import aau.project.drinkingfountainbackend.persistence.repository.ReviewImageRepository;
 import aau.project.drinkingfountainbackend.persistence.repository.ReviewRepository;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,14 +20,16 @@ public class ReviewService {
     private final ReviewImageRepository reviewImageRepository;
     private final LoginService loginService;
     private final DrinkingFountainService drinkingFountainService;
+    private final JwtTokenService jwtTokenService;
 
 
     @Autowired
-    public ReviewService(ReviewRepository reviewRepository, ReviewImageRepository reviewImageRepository, LoginService loginService, DrinkingFountainService drinkingFountainService) {
+    public ReviewService(ReviewRepository reviewRepository, ReviewImageRepository reviewImageRepository, LoginService loginService, DrinkingFountainService drinkingFountainService, JwtTokenService jwtTokenService) {
         this.reviewRepository = reviewRepository;
         this.reviewImageRepository = reviewImageRepository;
         this.loginService = loginService;
         this.drinkingFountainService = drinkingFountainService;
+        this.jwtTokenService = jwtTokenService;
     }
 
     public void deleteReview(int id) {
@@ -38,9 +41,9 @@ public class ReviewService {
     }
 
     @Transactional
-    public void addReview(ReviewRequestDTO reviewRequestDTO) {
+    public void addReview(ReviewRequestDTO reviewRequestDTO, HttpServletRequest httpServletRequest) {
         //@TODO user the current user
-        Optional<UserEntity> userEntity = loginService.getUserById(1);
+        Optional<UserEntity> userEntity = loginService.getUserById(jwtTokenService.getUserIdFromToken(httpServletRequest));
 
         if (userEntity.isEmpty()) {
             throw new NoSuchElementException("Item not found in database");

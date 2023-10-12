@@ -1,7 +1,7 @@
 package aau.project.drinkingfountainbackend.api.controller;
 
 import aau.project.drinkingfountainbackend.api.dto.UserDTO;
-import aau.project.drinkingfountainbackend.persistence.repository.UserRepository;
+import aau.project.drinkingfountainbackend.service.JwtTokenService;
 import aau.project.drinkingfountainbackend.service.LoginService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -11,11 +11,13 @@ import org.springframework.web.bind.annotation.*;
 @RestController()
 @RequestMapping("/auth")
 public class UserController {
-    UserRepository userRepository;
-    LoginService loginService;
+
+    private final JwtTokenService jwtTokenService;
+    private final LoginService loginService;
 
     @Autowired
-    public UserController(LoginService loginService) {
+    public UserController(JwtTokenService jwtTokenService, LoginService loginService) {
+        this.jwtTokenService = jwtTokenService;
         this.loginService = loginService;
     }
 
@@ -26,15 +28,17 @@ public class UserController {
 
     @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody UserDTO userDTO) {
-        if(loginService.login(userDTO)){
-            //@TODO generate JWT
-            return new ResponseEntity<>("JWT", HttpStatus.OK);
-        }
-        return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        return loginService.login(userDTO)
+                .map(userId -> {
+                    String token = jwtTokenService.generateToken(userId, "USER");
+                    return new ResponseEntity<>("Bearer " + token, HttpStatus.OK);
+                })
+                .orElseGet(() -> new ResponseEntity<>(HttpStatus.UNAUTHORIZED));
 
+    }
 
-
-
-
+    @PostMapping("/test")
+    public String test(){
+        return "test";
     }
 }

@@ -30,7 +30,7 @@ public class LoginService {
         String hashedPassword = BCrypt.hashpw(userDTO.password(), BCrypt.gensalt());
 
         UserEntity userEntity = UserEntity.builder()
-                .name(userDTO.userName())
+                .name(userDTO.username())
                 .password(hashedPassword)
                 .createdAt(ZonedDateTime.now())
                 .role(UserEntity.RoleType.valueOf(UserEntity.RoleType.USER.name()))
@@ -39,15 +39,15 @@ public class LoginService {
         userRepository.save(userEntity);
     }
 
-    public boolean login(UserDTO userDTO) {
-        Optional<UserEntity> userEntity = userRepository.findFirstByName(userDTO.userName());
+    public Optional<Integer> login(UserDTO userDTO) {
+        Optional<UserEntity> userEntity = userRepository.findFirstByName(userDTO.username());
 
         if (userEntity.isEmpty()) {
-            return false;
+            return Optional.empty();
         }
 
         // Verify user exists and check if password match
-        return userEntity.filter(entity -> checkPassword(userDTO.password(), entity.getPassword())).isPresent();
+        return userEntity.filter(entity -> checkPassword(userDTO.password(), entity.getPassword())).map(UserEntity::getId);
     }
 
     private boolean checkPassword(String inputPassword, String dataBasePassword){
