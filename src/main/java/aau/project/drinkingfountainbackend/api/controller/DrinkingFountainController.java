@@ -15,7 +15,7 @@ import java.util.List;
 @RequestMapping("/fountain")
 public class DrinkingFountainController {
 
-    DrinkingFountainService drinkingFountainService;
+    private final DrinkingFountainService drinkingFountainService;
 
     @Autowired
     public DrinkingFountainController(DrinkingFountainService drinkingFountainService) {
