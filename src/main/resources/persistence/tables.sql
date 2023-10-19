@@ -1,3 +1,6 @@
+--User the drinkingfountain database
+\c drinkingfountain;
+
 -- Create a new PostgreSQL table called "users"
 CREATE TABLE users (
     user_id SERIAL PRIMARY KEY, -- Auto-incrementing unique identifier for each user

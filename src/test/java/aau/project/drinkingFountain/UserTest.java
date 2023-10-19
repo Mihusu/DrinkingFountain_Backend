@@ -7,6 +7,6 @@ public class UserTest {
 
     @Test
     public void demoUser () {
-        UserEntity user = new UserEntity()
+        UserEntity user = new UserEntity();
     }
 }
