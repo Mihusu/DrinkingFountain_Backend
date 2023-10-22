@@ -60,6 +60,8 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
         http.authorizeHttpRequests(auth -> auth
                 .requestMatchers("/auth/**").permitAll()
+                .requestMatchers("/fountain/map").permitAll()
+                .requestMatchers("/fountain/{id}").permitAll()
                 .anyRequest().authenticated());
 
         http.csrf(AbstractHttpConfigurer::disable);
