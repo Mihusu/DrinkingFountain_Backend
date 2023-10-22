@@ -4,8 +4,9 @@
 -- Create a new PostgreSQL table called "users"
 CREATE TABLE users (
     user_id SERIAL PRIMARY KEY, -- Auto-incrementing unique identifier for each user
-    name VARCHAR(100) NOT NULL, -- Name of the user, cannot be NULL
-    password VARCHAR(100) UNIQUE NOT NULL, -- Password of the user, must be unique and cannot be NULL
+    name VARCHAR(100) UNIQUE NOT NULL, -- Name of the user, cannot be NULL
+    password VARCHAR(100) NOT NULL, -- Password of the user, cannot be NULL
+    role VARCHAR(100) NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE NOT NULL -- Timestamp indicating when the user was created, defaults to current timestamp
 );
 
