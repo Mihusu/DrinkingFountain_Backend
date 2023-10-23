@@ -7,7 +7,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.core.Authentication;
@@ -41,8 +40,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         } catch (Exception e){
-            response.setStatus(HttpStatus.UNAUTHORIZED.value());
-            return;
+            //Maybe log the failed jwt check
         }
         filterChain.doFilter(request, response);
     }
@@ -61,7 +59,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         http.authorizeHttpRequests(auth -> auth
                 .requestMatchers("/auth/**").permitAll()
                 .requestMatchers("/fountain/map").permitAll()
-                .requestMatchers("/fountain/{id}").permitAll()
+                .requestMatchers("/fountain/info/{id}").permitAll()
                 .anyRequest().authenticated());
 
         http.csrf(AbstractHttpConfigurer::disable);

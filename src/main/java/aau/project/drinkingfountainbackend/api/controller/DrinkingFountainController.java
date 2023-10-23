@@ -7,6 +7,7 @@ import aau.project.drinkingfountainbackend.service.DrinkingFountainService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,7 +23,7 @@ public class DrinkingFountainController {
         this.drinkingFountainService = drinkingFountainService;
     }
 
-    @GetMapping("{id}")
+    @GetMapping("/info/{id}")
     public ResponseEntity<DrinkingFountainDTO> getDrinkingFountain(@PathVariable int id){
         return drinkingFountainService.getDrinkingFountain(id)
                 .map(drinkingFountainDTO -> new ResponseEntity<>(drinkingFountainDTO, HttpStatus.OK))
@@ -40,6 +41,7 @@ public class DrinkingFountainController {
     }
 
     @PostMapping("/request")
+    @Secured("ROLE_ADMIN")
     public void createNewFountainRequest(@RequestBody DrinkingFountainRequestDTO drinkingFountainRequestDTO){
         drinkingFountainService.saveDrinkingFountainRequest(drinkingFountainRequestDTO);
     }
