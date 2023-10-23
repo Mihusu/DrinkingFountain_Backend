@@ -5,7 +5,6 @@ import aau.project.drinkingfountainbackend.api.dto.DrinkingFountainMapDTO;
 import aau.project.drinkingfountainbackend.api.dto.DrinkingFountainRequestDTO;
 import aau.project.drinkingfountainbackend.persistence.entity.DrinkingFountainEntity;
 import aau.project.drinkingfountainbackend.persistence.entity.DrinkingFountainImageEntity;
-import aau.project.drinkingfountainbackend.persistence.projection.DrinkingFountainMapProjection;
 import aau.project.drinkingfountainbackend.persistence.repository.DrinkingFountainImageRepository;
 import aau.project.drinkingfountainbackend.persistence.repository.DrinkingFountainRepository;
 import aau.project.drinkingfountainbackend.util.Base64Utility;
@@ -14,16 +13,15 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.time.Clock;
-import java.time.Instant;
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Stream;
+
+import static org.mockito.Mockito.mockStatic;
 
 @ExtendWith(MockitoExtension.class)
 public class DrinkingFountainServiceTest {
@@ -76,41 +74,44 @@ public class DrinkingFountainServiceTest {
 
     @Test
     void saveDrinkingFountainRequestTest() {
+        //Attributes
         double latitude = 232.3232232;
         double longitude = 53463.3552;
+        double score = 4;
+        DrinkingFountainEntity.FountainType type = DrinkingFountainEntity.FountainType.DRINKING;
+        String base64 = "redawr";
+        ZonedDateTime specificCreatedAt = ZonedDateTime.parse("2023-01-01T00:00:00.000000+01:00[Europe/Copenhagen]");
 
-        // Define a specific instant and time zone for your test
-        Instant fixedInstant = Instant.parse("2023-10-23T12:00:00Z");
-        ZoneId fixedTimeZone = ZoneId.of("UTC-1");
+        try (MockedStatic<ZonedDateTime> mockedStatic = mockStatic(ZonedDateTime.class)) {
+            mockedStatic.when(ZonedDateTime::now).thenReturn(specificCreatedAt);
 
-        // Create a Clock instance with the fixed instant and time zone
-        Clock fixedClock = Clock.fixed(fixedInstant, fixedTimeZone);
+            //Entities for mocking and verification
+            DrinkingFountainEntity expectedFountainEntityToBeSaved = DrinkingFountainEntity.builder()
+                    .latitude(latitude)
+                    .longitude(longitude)
+                    .type(type)
+                    .createdAt(specificCreatedAt)
+                    .approved(false)
+                    .score(score)
+                    .build();
 
-        ZonedDateTime expectedZonedDateTime = ZonedDateTime.ofInstant(fixedInstant, fixedTimeZone);
-        ZonedDateTime mockZonedDateTime = Mockito.mock(ZonedDateTime.class);
-        Mockito.when(ZonedDateTime.now(fixedClock)).thenReturn(expectedZonedDateTime);
+            DrinkingFountainImageEntity expectedFountainImageToBeSaved = DrinkingFountainImageEntity.builder()
+                    .image(Base64Utility.decode(base64))
+                    .createdAt(specificCreatedAt)
+                    .drinkingFountain(expectedFountainEntityToBeSaved)
+                    .build();
 
-        DrinkingFountainRequestDTO drinkingFountainRequestDTO = new DrinkingFountainRequestDTO(latitude, longitude,
-                DrinkingFountainEntity.FountainType.DRINKING, 4, "redawr");
+            //Mocking
+            Mockito.when(drinkingFountainRepository.save(expectedFountainEntityToBeSaved)).thenReturn(expectedFountainEntityToBeSaved);
 
-        drinkingFountainService.saveDrinkingFountainRequest(drinkingFountainRequestDTO);
+            //Test
+            DrinkingFountainRequestDTO drinkingFountainRequestDTO = new DrinkingFountainRequestDTO(latitude, longitude, type, score, base64);
+            drinkingFountainService.saveDrinkingFountainRequest(drinkingFountainRequestDTO);
 
-        DrinkingFountainEntity expectedFountainEntityToBeSaved = DrinkingFountainEntity.builder()
-                .latitude(latitude)
-                .longitude(longitude)
-                .type(DrinkingFountainEntity.FountainType.DRINKING)
-                .createdAt(ZonedDateTime.now(fixedClock))
-                .approved(false)
-                .score(4)
-                .reviewEntities(List.of())
-                .build();
-
-        DrinkingFountainImageEntity expectedFountainImageToBeSaved = DrinkingFountainImageEntity.builder()
-                .image(Base64Utility.decode(drinkingFountainRequestDTO.base64Images()))
-                .createdAt(ZonedDateTime.now(fixedClock))
-                .drinkingFountain(expectedFountainEntityToBeSaved)
-                .build();
-
-        Mockito.verify(drinkingFountainImageRepository, Mockito.times(1)).save(expectedFountainImageToBeSaved);
+            //Assertions
+            Mockito.verify(drinkingFountainImageRepository, Mockito.times(1)).save(expectedFountainImageToBeSaved);
+            Mockito.verify(drinkingFountainRepository, Mockito.times(1)).save(expectedFountainEntityToBeSaved);
+        }
     }
+
 }
