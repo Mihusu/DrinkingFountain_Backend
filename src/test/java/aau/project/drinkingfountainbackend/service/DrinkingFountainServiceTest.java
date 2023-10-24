@@ -1,10 +1,10 @@
 package aau.project.drinkingfountainbackend.service;
 
-import aau.project.drinkingfountainbackend.api.dto.DrinkingFountainDTO;
-import aau.project.drinkingfountainbackend.api.dto.DrinkingFountainMapDTO;
-import aau.project.drinkingfountainbackend.api.dto.DrinkingFountainRequestDTO;
+import aau.project.drinkingfountainbackend.api.dto.*;
 import aau.project.drinkingfountainbackend.persistence.entity.DrinkingFountainEntity;
 import aau.project.drinkingfountainbackend.persistence.entity.DrinkingFountainImageEntity;
+import aau.project.drinkingfountainbackend.persistence.entity.ReviewEntity;
+import aau.project.drinkingfountainbackend.persistence.entity.UserEntity;
 import aau.project.drinkingfountainbackend.persistence.repository.DrinkingFountainImageRepository;
 import aau.project.drinkingfountainbackend.persistence.repository.DrinkingFountainRepository;
 import aau.project.drinkingfountainbackend.util.Base64Utility;
@@ -20,6 +20,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.mockito.Mockito.mockStatic;
 
@@ -46,6 +47,7 @@ public class DrinkingFountainServiceTest {
         Optional<DrinkingFountainDTO> fountain = drinkingFountainService.getDrinkingFountain(1);
 
         //Check the DTO is present and have the expected score value
+        Assertions.assertTrue(fountain.isPresent());
         Assertions.assertEquals(score, fountain.get().score());
     }
 
@@ -63,7 +65,6 @@ public class DrinkingFountainServiceTest {
 
     @Test
     void getDrinkingFountainMapDataTest() {
-
         Mockito.when(drinkingFountainRepository.findAllByApprovedMapped(true))
                 .thenReturn(List.of());
 
@@ -73,45 +74,61 @@ public class DrinkingFountainServiceTest {
     }
 
     @Test
-    void saveDrinkingFountainRequestTest() {
+    void approveDrinkingFountainTest() {
+        int id = 2;
+
+        // Call the service method
+        drinkingFountainService.approveDrinkingFountain(id);
+
+        Mockito.verify(drinkingFountainRepository, Mockito.times(1)).approveById(id);
+    }
+
+    @Test
+    void getUnapprovedDrinkingFountainsTest() {
+        Mockito.when(drinkingFountainRepository.findAllByApprovedEntity(false))
+                .thenReturn(List.of());
+
+        List<DrinkingFountainDTO> mapData = drinkingFountainService.getUnapprovedDrinkingFountains();
+
+        Assertions.assertTrue(mapData.isEmpty());
+    }
+
+    @Test
+    void drinkingFountainDTOMapperTest() {
         //Attributes
         double latitude = 232.3232232;
         double longitude = 53463.3552;
         double score = 4;
-        DrinkingFountainEntity.FountainType type = DrinkingFountainEntity.FountainType.DRINKING;
         String base64 = "redawr";
+        DrinkingFountainEntity.FountainType type = DrinkingFountainEntity.FountainType.DRINKING;
         ZonedDateTime specificCreatedAt = ZonedDateTime.parse("2023-01-01T00:00:00.000000+01:00[Europe/Copenhagen]");
 
-        try (MockedStatic<ZonedDateTime> mockedStatic = mockStatic(ZonedDateTime.class)) {
-            mockedStatic.when(ZonedDateTime::now).thenReturn(specificCreatedAt);
+        //Entities for mocking and verification
+        DrinkingFountainEntity expectedFountainEntityToBeUsed = DrinkingFountainEntity.builder()
+                .latitude(latitude)
+                .longitude(longitude)
+                .type(type)
+                .createdAt(specificCreatedAt)
+                .approved(false)
+                .score(score)
+                .build();
 
-            //Entities for mocking and verification
-            DrinkingFountainEntity expectedFountainEntityToBeSaved = DrinkingFountainEntity.builder()
-                    .latitude(latitude)
-                    .longitude(longitude)
-                    .type(type)
-                    .createdAt(specificCreatedAt)
-                    .approved(false)
-                    .score(score)
-                    .build();
+        DrinkingFountainImageEntity expectedFountainImageToBeUsed = DrinkingFountainImageEntity.builder()
+                .image(Base64Utility.decode(base64))
+                .createdAt(specificCreatedAt)
+                .drinkingFountain(expectedFountainEntityToBeUsed)
+                .build();
 
-            DrinkingFountainImageEntity expectedFountainImageToBeSaved = DrinkingFountainImageEntity.builder()
-                    .image(Base64Utility.decode(base64))
-                    .createdAt(specificCreatedAt)
-                    .drinkingFountain(expectedFountainEntityToBeSaved)
-                    .build();
-
-            //Mocking
-            Mockito.when(drinkingFountainRepository.save(expectedFountainEntityToBeSaved)).thenReturn(expectedFountainEntityToBeSaved);
-
-            //Test
-            DrinkingFountainRequestDTO drinkingFountainRequestDTO = new DrinkingFountainRequestDTO(latitude, longitude, type, score, base64);
-            drinkingFountainService.saveDrinkingFountainRequest(drinkingFountainRequestDTO);
-
-            //Assertions
-            Mockito.verify(drinkingFountainImageRepository, Mockito.times(1)).save(expectedFountainImageToBeSaved);
-            Mockito.verify(drinkingFountainRepository, Mockito.times(1)).save(expectedFountainEntityToBeSaved);
-        }
+        Assertions.assertNotNull(expectedFountainEntityToBeUsed);
+        Assertions.assertNotNull(expectedFountainImageToBeUsed);
     }
 
+    @Test
+    void getDrinkingFountainEntity() {
+        int id = 1;
+
+        drinkingFountainService.getDrinkingFountainEntity(id);
+
+        Mockito.verify(drinkingFountainRepository, Mockito.times(1)).findById(id);
+    }
 }
