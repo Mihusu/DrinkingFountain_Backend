@@ -3,8 +3,6 @@ package aau.project.drinkingfountainbackend.service;
 import aau.project.drinkingfountainbackend.api.dto.*;
 import aau.project.drinkingfountainbackend.persistence.entity.DrinkingFountainEntity;
 import aau.project.drinkingfountainbackend.persistence.entity.DrinkingFountainImageEntity;
-import aau.project.drinkingfountainbackend.persistence.entity.ReviewEntity;
-import aau.project.drinkingfountainbackend.persistence.entity.UserEntity;
 import aau.project.drinkingfountainbackend.persistence.repository.DrinkingFountainImageRepository;
 import aau.project.drinkingfountainbackend.persistence.repository.DrinkingFountainRepository;
 import aau.project.drinkingfountainbackend.util.Base64Utility;
@@ -13,16 +11,12 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
-
-import static org.mockito.Mockito.mockStatic;
 
 @ExtendWith(MockitoExtension.class)
 public class DrinkingFountainServiceTest {
@@ -98,19 +92,29 @@ public class DrinkingFountainServiceTest {
         //Attributes
         double latitude = 232.3232232;
         double longitude = 53463.3552;
-        double score = 4;
+        double score = 4.0;
         String base64 = "redawr";
         DrinkingFountainEntity.FountainType type = DrinkingFountainEntity.FountainType.DRINKING;
         ZonedDateTime specificCreatedAt = ZonedDateTime.parse("2023-01-01T00:00:00.000000+01:00[Europe/Copenhagen]");
 
+        // Mock a DrinkingFountainRequestDTO instance
+        DrinkingFountainRequestDTO requestDTO = Mockito.mock(DrinkingFountainRequestDTO.class);
+
+        // Stub the methods of the mock object if necessary
+        Mockito.when(requestDTO.latitude()).thenReturn(latitude);
+        Mockito.when(requestDTO.longitude()).thenReturn(longitude);
+        Mockito.when(requestDTO.type()).thenReturn(type);
+        Mockito.when(requestDTO.score()).thenReturn(score);
+        Mockito.when(requestDTO.base64Images()).thenReturn(base64);
+
         //Entities for mocking and verification
         DrinkingFountainEntity expectedFountainEntityToBeUsed = DrinkingFountainEntity.builder()
-                .latitude(latitude)
-                .longitude(longitude)
-                .type(type)
+                .latitude(requestDTO.latitude())
+                .longitude(requestDTO.longitude())
+                .type(requestDTO.type())
                 .createdAt(specificCreatedAt)
                 .approved(false)
-                .score(score)
+                .score(requestDTO.score())
                 .build();
 
         DrinkingFountainImageEntity expectedFountainImageToBeUsed = DrinkingFountainImageEntity.builder()
@@ -118,6 +122,8 @@ public class DrinkingFountainServiceTest {
                 .createdAt(specificCreatedAt)
                 .drinkingFountain(expectedFountainEntityToBeUsed)
                 .build();
+
+        drinkingFountainService.saveDrinkingFountainRequest(requestDTO);
 
         Assertions.assertNotNull(expectedFountainEntityToBeUsed);
         Assertions.assertNotNull(expectedFountainImageToBeUsed);
