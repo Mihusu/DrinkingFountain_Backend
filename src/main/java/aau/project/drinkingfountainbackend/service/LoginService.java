@@ -3,6 +3,8 @@ package aau.project.drinkingfountainbackend.service;
 import aau.project.drinkingfountainbackend.api.dto.UserDTO;
 import aau.project.drinkingfountainbackend.persistence.entity.UserEntity;
 import aau.project.drinkingfountainbackend.persistence.repository.UserRepository;
+import aau.project.drinkingfountainbackend.util.InvalidPasswordException;
+import aau.project.drinkingfountainbackend.util.InvalidUsernameException;
 import jakarta.transaction.Transactional;
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +37,14 @@ public class LoginService {
                 .createdAt(ZonedDateTime.now())
                 .role(UserEntity.RoleType.valueOf(UserEntity.RoleType.USER.name()))
                 .build();
+
+        if (userDTO.username() == null || userDTO.username().length() < 2) {
+            throw new InvalidUsernameException();
+        }
+
+        if (userDTO.password().length() < 8) {
+            throw new InvalidPasswordException();
+        }
 
         userRepository.save(userEntity);
     }
