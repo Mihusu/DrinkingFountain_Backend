@@ -43,7 +43,7 @@ public class JwtTokenService implements Serializable {
         return doGenerateToken(String.valueOf(userId), role);
     }
 
-    public String doGenerateToken(String userId, String role) {
+    private String doGenerateToken(String userId, String role) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("role", role); // Add the role as a claim
 

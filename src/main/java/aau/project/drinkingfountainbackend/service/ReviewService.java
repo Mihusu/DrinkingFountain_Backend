@@ -45,19 +45,20 @@ public class ReviewService {
         Optional<UserEntity> userEntity = loginService.getUserById(jwtTokenService.getUserIdFromToken(httpServletRequest));
 
         if (userEntity.isEmpty()) {
-            throw new NoSuchElementException("Item not found in database");
+            throw new NoSuchElementException("User not found in database");
         }
 
         Optional<DrinkingFountainEntity> drinkingFountainEntity = drinkingFountainService.getDrinkingFountainEntity(reviewRequestDTO.drinkingFountainId());
 
         if (drinkingFountainEntity.isEmpty()) {
-            throw new NoSuchElementException("Item not found in database");
+            throw new NoSuchElementException("Drinking fountain not found in database");
         }
 
             ReviewEntity reviewEntity = ReviewEntity.builder()
                     .text(reviewRequestDTO.text())
                     .stars(reviewRequestDTO.stars())
-                    .type(DrinkingFountainEntity.FountainType.valueOf(reviewRequestDTO.fountainType()))
+                    .reviewImages(List.of())
+                    .type(reviewRequestDTO.type())
                     .userEntity(userEntity.get())
                     .createdAt(ZonedDateTime.now())
                     .drinkingFountain(drinkingFountainEntity.get())
