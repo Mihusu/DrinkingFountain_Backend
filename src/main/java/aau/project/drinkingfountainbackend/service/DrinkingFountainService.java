@@ -3,12 +3,15 @@ package aau.project.drinkingfountainbackend.service;
 import aau.project.drinkingfountainbackend.api.dto.*;
 import aau.project.drinkingfountainbackend.persistence.entity.DrinkingFountainEntity;
 import aau.project.drinkingfountainbackend.persistence.entity.DrinkingFountainImageEntity;
+import aau.project.drinkingfountainbackend.persistence.projection.DrinkingFountainListViewProjection;
 import aau.project.drinkingfountainbackend.persistence.projection.DrinkingFountainMapProjection;
 import aau.project.drinkingfountainbackend.persistence.repository.DrinkingFountainImageRepository;
 import aau.project.drinkingfountainbackend.persistence.repository.DrinkingFountainRepository;
 import aau.project.drinkingfountainbackend.util.Base64Utility;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.ZonedDateTime;
@@ -33,10 +36,10 @@ public class DrinkingFountainService {
         return drinkingFountainEntity.flatMap(entity -> Optional.of(drinkingFountainDTOMapper(entity)));
     }
 
-    public List<DrinkingFountainMapDTO> getDrinkingFountainMapData(){
-        List<DrinkingFountainMapProjection> drinkingFountainMapProjections = drinkingFountainRepository.findAllByApprovedMapped(true);
+    public List<DrinkingFountainMapDTO> getDrinkingFountainMapData(double latitude, double longitude){
+        List<DrinkingFountainMapProjection> drinkingFountainMapProjections = drinkingFountainRepository.findAllByApprovedMapped(latitude, longitude, true);
         return drinkingFountainMapProjections.stream().map(
-                entity -> new DrinkingFountainMapDTO(entity.getId(),entity.getLatitude(), entity.getLongitude())
+                entity -> new DrinkingFountainMapDTO(entity.getId(),entity.getLatitude(), entity.getLongitude(), entity.getDistance())
         ).collect(Collectors.toList());
     }
 
@@ -103,5 +106,15 @@ public class DrinkingFountainService {
 
     public Optional<DrinkingFountainEntity> getDrinkingFountainEntity(int i) {
         return drinkingFountainRepository.findById(i);
+    }
+
+    public List<FountainListViewDTO> getNearestDrinkingFountains(double latitude, double longitude) {
+        Pageable pageRequest = PageRequest.of(0, 5);
+        List<DrinkingFountainListViewProjection> projectionList = drinkingFountainRepository.findNearestFountains(latitude, longitude, pageRequest);
+        return projectionList.stream().map(this::fountainListViewDTOMapper).toList();
+    }
+
+    private FountainListViewDTO fountainListViewDTOMapper(DrinkingFountainListViewProjection projection){
+        return new FountainListViewDTO(projection.getId(), projection.getDistance(), projection.getType(), projection.getScore());
     }
 }
