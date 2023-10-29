@@ -62,10 +62,10 @@ public class DrinkingFountainServiceTest {
 
     @Test
     void getDrinkingFountainMapDataTest() {
-        Mockito.when(drinkingFountainRepository.findAllByApprovedMapped(true))
+        Mockito.when(drinkingFountainRepository.findAllByApprovedMapped(10., 50,true))
                 .thenReturn(List.of());
 
-        List<DrinkingFountainMapDTO> mapData = drinkingFountainService.getDrinkingFountainMapData();
+        List<DrinkingFountainMapDTO> mapData = drinkingFountainService.getDrinkingFountainMapData(10.,50);
 
         Assertions.assertTrue(mapData.isEmpty());
     }
