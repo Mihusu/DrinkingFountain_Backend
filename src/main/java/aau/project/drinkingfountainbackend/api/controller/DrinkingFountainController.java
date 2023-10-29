@@ -3,6 +3,7 @@ package aau.project.drinkingfountainbackend.api.controller;
 import aau.project.drinkingfountainbackend.api.dto.DrinkingFountainMapDTO;
 import aau.project.drinkingfountainbackend.api.dto.DrinkingFountainRequestDTO;
 import aau.project.drinkingfountainbackend.api.dto.DrinkingFountainDTO;
+import aau.project.drinkingfountainbackend.api.dto.FountainListViewDTO;
 import aau.project.drinkingfountainbackend.service.DrinkingFountainService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -30,8 +31,8 @@ public class DrinkingFountainController {
     }
 
     @GetMapping("/map")
-    public ResponseEntity<List<DrinkingFountainMapDTO>> getDrinkingFountainMapData(){
-        return new ResponseEntity<>(drinkingFountainService.getDrinkingFountainMapData(), HttpStatus.OK);
+    public ResponseEntity<List<DrinkingFountainMapDTO>> getDrinkingFountainMapData(@RequestParam double latitude, @RequestParam double longitude){
+        return new ResponseEntity<>(drinkingFountainService.getDrinkingFountainMapData(latitude, longitude), HttpStatus.OK);
     }
 
     @GetMapping("/unapproved")
@@ -49,4 +50,9 @@ public class DrinkingFountainController {
         drinkingFountainService.approveDrinkingFountain(id);
     }
 
+    @GetMapping("/nearest/list")
+    public ResponseEntity<List<FountainListViewDTO>> getNearestFountains(@RequestParam double latitude, @RequestParam double longitude){
+        List<FountainListViewDTO> fountains = drinkingFountainService.getNearestDrinkingFountains(latitude, longitude);
+        return new ResponseEntity<>(fountains, HttpStatus.OK);
+    }
 }

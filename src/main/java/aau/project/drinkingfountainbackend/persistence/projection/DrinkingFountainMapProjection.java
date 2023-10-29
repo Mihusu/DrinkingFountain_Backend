@@ -4,4 +4,5 @@ public interface DrinkingFountainMapProjection {
     int getId();
     double getLatitude();
     double getLongitude();
+    double getDistance();
 }
