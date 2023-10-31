@@ -23,7 +23,7 @@ public class LoginService {
         this.userRepository = userRepository;
     }
 
-    protected Optional<UserEntity> getUserById(int id){
+    protected Optional<UserEntity> getUserById(int id) {
         return userRepository.findById(id);
     }
 
@@ -60,7 +60,7 @@ public class LoginService {
         return userEntity.filter(entity -> checkPassword(userDTO.password(), entity.getPassword())).map(UserEntity::getId);
     }
 
-    private boolean checkPassword(String inputPassword, String dataBasePassword){
+    private boolean checkPassword(String inputPassword, String dataBasePassword) {
         return BCrypt.checkpw(inputPassword, dataBasePassword);
     }
 }

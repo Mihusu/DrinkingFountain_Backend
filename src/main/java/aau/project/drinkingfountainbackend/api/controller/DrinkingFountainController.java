@@ -5,6 +5,7 @@ import aau.project.drinkingfountainbackend.api.dto.DrinkingFountainRequestDTO;
 import aau.project.drinkingfountainbackend.api.dto.DrinkingFountainDTO;
 import aau.project.drinkingfountainbackend.api.dto.FountainListViewDTO;
 import aau.project.drinkingfountainbackend.service.DrinkingFountainService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -41,8 +42,8 @@ public class DrinkingFountainController {
     }
 
     @PostMapping("/request")
-    public void createNewFountainRequest(@RequestBody DrinkingFountainRequestDTO drinkingFountainRequestDTO){
-        drinkingFountainService.saveDrinkingFountainRequest(drinkingFountainRequestDTO);
+    public void createNewFountainRequest(@RequestBody DrinkingFountainRequestDTO drinkingFountainRequestDTO, HttpServletRequest httpServletRequest){
+        drinkingFountainService.saveDrinkingFountainRequest(drinkingFountainRequestDTO, httpServletRequest);
     }
 
     @PostMapping("approve/{id}")

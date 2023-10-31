@@ -42,8 +42,9 @@ public interface DrinkingFountainRepository extends JpaRepository<DrinkingFounta
             "(6371 * acos(cos(radians(:lat)) * cos(radians(df.latitude)) * cos(radians(df.longitude) - radians(:lon)) + sin(radians(:lat)) * sin(radians(df.latitude)))) AS distance, " +
             "df.type AS type, " +
             "df.score AS score " +
-            "FROM DrinkingFountainEntity df ORDER BY distance")
+            "FROM DrinkingFountainEntity df WHERE df.approved = :approved ORDER BY distance")
     List<DrinkingFountainListViewProjection> findNearestFountains(@Param("lat") double lat,
                                                                   @Param("lon") double lon,
+                                                                  @Param("approved") boolean approved,
                                                                   Pageable pageable);
 }
