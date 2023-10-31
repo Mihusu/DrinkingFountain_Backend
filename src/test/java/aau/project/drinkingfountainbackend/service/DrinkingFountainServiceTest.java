@@ -34,6 +34,9 @@ public class DrinkingFountainServiceTest {
     @Mock
     private DrinkingFountainImageRepository drinkingFountainImageRepository;
 
+    @Mock
+    private ReviewService reviewService;
+
     @Test
     void getDrinkingFountainWithDataTest(){
         double score = 2;
