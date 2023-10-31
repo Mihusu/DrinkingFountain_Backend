@@ -85,8 +85,4 @@ public class ReviewService {
         }
         reviewImageRepository.saveAll(reviewImageEntities);
     }
-
-    public void test() {
-        System.out.println("test");
-    }
 }

@@ -93,7 +93,7 @@ public class DrinkingFountainService {
                     reviewEntity.getStars(),
                     reviewImages,
                     reviewEntity.getType(),
-                    "test",
+                    reviewEntity.getUserEntity().getName(),
                     reviewEntity.getCreatedAt());
         }).toList();
 
