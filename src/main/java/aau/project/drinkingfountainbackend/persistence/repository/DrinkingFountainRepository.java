@@ -37,6 +37,8 @@ public interface DrinkingFountainRepository extends JpaRepository<DrinkingFounta
 
     //Distance is in km as 6371 is the radius of the Earth in km
     @Query("SELECT df.id AS id, " +
+            "df.longitude as longitude," +
+            "df.latitude as latitude," +
             "(6371 * acos(cos(radians(:lat)) * cos(radians(df.latitude)) * cos(radians(df.longitude) - radians(:lon)) + sin(radians(:lat)) * sin(radians(df.latitude)))) AS distance, " +
             "df.type AS type, " +
             "df.score AS score " +

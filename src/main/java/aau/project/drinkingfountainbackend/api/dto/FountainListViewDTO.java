@@ -5,6 +5,8 @@ import aau.project.drinkingfountainbackend.persistence.entity.DrinkingFountainEn
 public record FountainListViewDTO(
         int id,
         double distance,
+        double latitude,
+        double longitude,
         DrinkingFountainEntity.FountainType type,
         double score) {
 }

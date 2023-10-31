@@ -5,6 +5,8 @@ import aau.project.drinkingfountainbackend.persistence.entity.DrinkingFountainEn
 public interface DrinkingFountainListViewProjection {
     int getId();
     double getDistance();
+    double getLatitude();
+    double getLongitude();
     DrinkingFountainEntity.FountainType getType();
     double getScore();
 }
