@@ -8,6 +8,7 @@ import aau.project.drinkingfountainbackend.persistence.projection.DrinkingFounta
 import aau.project.drinkingfountainbackend.persistence.repository.DrinkingFountainImageRepository;
 import aau.project.drinkingfountainbackend.persistence.repository.DrinkingFountainRepository;
 import aau.project.drinkingfountainbackend.util.Base64Utility;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -24,11 +25,13 @@ public class DrinkingFountainService {
 
     private final DrinkingFountainRepository drinkingFountainRepository;
     private final DrinkingFountainImageRepository drinkingFountainImageRepository;
+    private final ReviewService reviewService;
 
     @Autowired
-    public DrinkingFountainService(DrinkingFountainRepository drinkingFountainRepository, DrinkingFountainImageRepository drinkingFountainImageRepository) {
+    public DrinkingFountainService(DrinkingFountainRepository drinkingFountainRepository, DrinkingFountainImageRepository drinkingFountainImageRepository, ReviewService reviewService) {
         this.drinkingFountainRepository = drinkingFountainRepository;
         this.drinkingFountainImageRepository = drinkingFountainImageRepository;
+        this.reviewService = reviewService;
     }
 
     public Optional<DrinkingFountainDTO> getDrinkingFountain(int id){
@@ -44,7 +47,9 @@ public class DrinkingFountainService {
     }
 
     @Transactional
-    public void saveDrinkingFountainRequest(DrinkingFountainRequestDTO drinkingFountainRequestDTO) {
+    public void saveDrinkingFountainRequest(DrinkingFountainRequestDTO drinkingFountainRequestDTO, HttpServletRequest httpServletRequest) {
+        drinkingFountainRequestDTO.score();
+
         DrinkingFountainEntity savedDrinkingFountain = drinkingFountainRepository.save(DrinkingFountainEntity.builder()
                 .latitude(drinkingFountainRequestDTO.latitude())
                 .longitude(drinkingFountainRequestDTO.longitude())
@@ -61,6 +66,15 @@ public class DrinkingFountainService {
                         .image(Base64Utility.decode(drinkingFountainRequestDTO.base64Images()))
                         .createdAt(ZonedDateTime.now())
                 .build());
+
+        reviewService.addReview(new ReviewRequestDTO(
+                drinkingFountainRequestDTO.review(),
+                drinkingFountainRequestDTO.score(),
+                List.of(),
+                drinkingFountainRequestDTO.type(),
+                savedDrinkingFountain.getId(),
+                ZonedDateTime.now()
+                ), httpServletRequest);
     }
 
     public void approveDrinkingFountain(int id) {
@@ -110,7 +124,8 @@ public class DrinkingFountainService {
 
     public List<FountainListViewDTO> getNearestDrinkingFountains(double latitude, double longitude) {
         Pageable pageRequest = PageRequest.of(0, 5);
-        List<DrinkingFountainListViewProjection> projectionList = drinkingFountainRepository.findNearestFountains(latitude, longitude, pageRequest);
+        boolean approvedStatus = true;
+        List<DrinkingFountainListViewProjection> projectionList = drinkingFountainRepository.findNearestFountains(latitude, longitude, approvedStatus, pageRequest);
         return projectionList.stream().map(this::fountainListViewDTOMapper).toList();
     }
 
