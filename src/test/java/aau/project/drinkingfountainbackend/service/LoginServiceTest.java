@@ -3,6 +3,8 @@ package aau.project.drinkingfountainbackend.service;
 import aau.project.drinkingfountainbackend.api.dto.UserDTO;
 import aau.project.drinkingfountainbackend.persistence.entity.UserEntity;
 import aau.project.drinkingfountainbackend.persistence.repository.UserRepository;
+import aau.project.drinkingfountainbackend.util.InvalidPasswordException;
+import aau.project.drinkingfountainbackend.util.InvalidUsernameException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,7 +35,35 @@ public class LoginServiceTest {
         loginService.registerUser(userDTO);
 
         Mockito.verify(userRepository, Mockito.times(1)).save(Mockito.any(UserEntity.class));
+    }
 
+    @Test
+    void registerUserWithAnInvalidUsernameTest() {
+        String name = "";
+        String password = "password";
+
+        UserDTO userDTO = new UserDTO(name, password);
+        Assertions.assertThrows(InvalidUsernameException.class, () -> {
+            loginService.registerUser(userDTO);
+        });
+
+        // Verify that the userRepository.save method is not called
+        Mockito.verify(userRepository, Mockito.times(0)).save(Mockito.any(UserEntity.class));
+    }
+
+    @Test
+    void registerUserWithAnInvalidPasswordTest() {
+        String name = "Mihusu";
+        String password = "passwor";
+
+        UserDTO userDTO = new UserDTO(name, password);
+
+        Assertions.assertThrows(InvalidPasswordException.class, () -> {
+            loginService.registerUser(userDTO);
+        });
+
+        // Verify that the userRepository.save method is not called
+        Mockito.verify(userRepository, Mockito.times(0)).save(Mockito.any(UserEntity.class));
     }
 
     @Test
