@@ -5,6 +5,7 @@ import aau.project.drinkingfountainbackend.persistence.entity.DrinkingFountainEn
 import aau.project.drinkingfountainbackend.persistence.entity.ReviewEntity;
 import aau.project.drinkingfountainbackend.persistence.entity.ReviewImageEntity;
 import aau.project.drinkingfountainbackend.persistence.entity.UserEntity;
+import aau.project.drinkingfountainbackend.persistence.repository.DrinkingFountainRepository;
 import aau.project.drinkingfountainbackend.persistence.repository.ReviewImageRepository;
 import aau.project.drinkingfountainbackend.persistence.repository.ReviewRepository;
 import org.junit.jupiter.api.Assertions;
@@ -36,7 +37,7 @@ public class ReviewServiceTest {
     private JwtTokenService jwtTokenService;
 
     @Mock
-    private DrinkingFountainService drinkingFountainService;
+    private DrinkingFountainRepository drinkingFountainRepository;
 
     @Mock
     private LoginService loginService;
@@ -144,7 +145,7 @@ public class ReviewServiceTest {
                     .reviewEntities(List.of())
                     .build();
 
-            Mockito.when(drinkingFountainService.getDrinkingFountainEntity(reviewRequestDTO.drinkingFountainId())).thenReturn(Optional.of(fountainEntity));
+            Mockito.when(drinkingFountainRepository.findById(reviewRequestDTO.drinkingFountainId())).thenReturn(Optional.of(fountainEntity));
 
             ReviewEntity reviewEntity = ReviewEntity.builder()
                     .text(reviewRequestDTO.text())

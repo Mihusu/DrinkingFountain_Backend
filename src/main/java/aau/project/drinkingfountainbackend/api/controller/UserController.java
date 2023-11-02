@@ -34,6 +34,5 @@ public class UserController {
                     return new ResponseEntity<>("Bearer " + token, HttpStatus.OK);
                 })
                 .orElseGet(() -> new ResponseEntity<>(HttpStatus.UNAUTHORIZED));
-
     }
 }

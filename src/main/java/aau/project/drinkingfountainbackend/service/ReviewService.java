@@ -3,6 +3,7 @@ package aau.project.drinkingfountainbackend.service;
 import aau.project.drinkingfountainbackend.api.dto.ReviewDTO;
 import aau.project.drinkingfountainbackend.api.dto.ReviewRequestDTO;
 import aau.project.drinkingfountainbackend.persistence.entity.*;
+import aau.project.drinkingfountainbackend.persistence.repository.DrinkingFountainRepository;
 import aau.project.drinkingfountainbackend.persistence.repository.ReviewImageRepository;
 import aau.project.drinkingfountainbackend.persistence.repository.ReviewRepository;
 import jakarta.servlet.http.HttpServletRequest;
@@ -18,17 +19,17 @@ public class ReviewService {
 
     private final ReviewRepository reviewRepository;
     private final ReviewImageRepository reviewImageRepository;
+    private final DrinkingFountainRepository drinkingFountainRepository;
     private final LoginService loginService;
-    private final DrinkingFountainService drinkingFountainService;
     private final JwtTokenService jwtTokenService;
 
 
     @Autowired
-    public ReviewService(ReviewRepository reviewRepository, ReviewImageRepository reviewImageRepository, LoginService loginService, DrinkingFountainService drinkingFountainService, JwtTokenService jwtTokenService) {
+    public ReviewService(ReviewRepository reviewRepository, ReviewImageRepository reviewImageRepository, DrinkingFountainRepository drinkingFountainRepository, LoginService loginService, JwtTokenService jwtTokenService) {
         this.reviewRepository = reviewRepository;
         this.reviewImageRepository = reviewImageRepository;
+        this.drinkingFountainRepository = drinkingFountainRepository;
         this.loginService = loginService;
-        this.drinkingFountainService = drinkingFountainService;
         this.jwtTokenService = jwtTokenService;
     }
 
@@ -48,21 +49,21 @@ public class ReviewService {
             throw new NoSuchElementException("User not found in database");
         }
 
-        Optional<DrinkingFountainEntity> drinkingFountainEntity = drinkingFountainService.getDrinkingFountainEntity(reviewRequestDTO.drinkingFountainId());
+        Optional<DrinkingFountainEntity> drinkingFountainEntity = drinkingFountainRepository.findById(reviewRequestDTO.drinkingFountainId());
 
         if (drinkingFountainEntity.isEmpty()) {
             throw new NoSuchElementException("Drinking fountain not found in database");
         }
 
-            ReviewEntity reviewEntity = ReviewEntity.builder()
-                    .text(reviewRequestDTO.text())
-                    .stars(reviewRequestDTO.stars())
-                    .reviewImages(List.of())
-                    .type(reviewRequestDTO.type())
-                    .userEntity(userEntity.get())
-                    .createdAt(ZonedDateTime.now())
-                    .drinkingFountain(drinkingFountainEntity.get())
-                    .build();
+        ReviewEntity reviewEntity = ReviewEntity.builder()
+                .text(reviewRequestDTO.text())
+                .stars(reviewRequestDTO.stars())
+                .reviewImages(List.of())
+                .type(reviewRequestDTO.type())
+                .userEntity(userEntity.get())
+                .createdAt(ZonedDateTime.now())
+                .drinkingFountain(drinkingFountainEntity.get())
+                .build();
 
         ReviewEntity savedReview = reviewRepository.save(reviewEntity);
 
