@@ -56,4 +56,9 @@ public class DrinkingFountainController {
         List<FountainListViewDTO> fountains = drinkingFountainService.getNearestDrinkingFountains(latitude, longitude);
         return new ResponseEntity<>(fountains, HttpStatus.OK);
     }
+
+    @PostMapping("unapprove/{id}")
+    public void unapproveDrinkingFountain(@PathVariable int id) {
+        drinkingFountainService.unapproveDrinkingFountain(id);
+    }
 }

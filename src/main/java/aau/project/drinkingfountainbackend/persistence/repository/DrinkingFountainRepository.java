@@ -47,4 +47,6 @@ public interface DrinkingFountainRepository extends JpaRepository<DrinkingFounta
                                                                   @Param("lon") double lon,
                                                                   @Param("approved") boolean approved,
                                                                   Pageable pageable);
+
+    void deleteById(int id);
 }
