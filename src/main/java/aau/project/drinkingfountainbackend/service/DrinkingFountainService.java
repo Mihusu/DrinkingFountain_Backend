@@ -64,6 +64,10 @@ public class DrinkingFountainService {
         drinkingFountainRepository.approveById(id);
     }
 
+    public void unapproveDrinkingFountain(int id) {
+        drinkingFountainRepository.deleteById(id);
+    }
+
     public List<DrinkingFountainDTO> getUnapprovedDrinkingFountains() {
         List<DrinkingFountainEntity> unapproved = drinkingFountainRepository.findAllByApprovedEntity(false);
         return unapproved.stream().map(this::drinkingFountainDTOMapper).collect(Collectors.toList());

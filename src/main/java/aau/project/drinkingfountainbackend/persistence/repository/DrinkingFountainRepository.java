@@ -26,4 +26,6 @@ public interface DrinkingFountainRepository extends JpaRepository<DrinkingFounta
     @Transactional
     @Query("UPDATE DrinkingFountainEntity e SET e.approved = true WHERE e.id = :id")
     void approveById(@Param("id") int id);
+
+    void deleteById(int id);
 }

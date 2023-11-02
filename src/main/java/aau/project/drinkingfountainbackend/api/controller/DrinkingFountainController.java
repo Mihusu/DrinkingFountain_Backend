@@ -49,4 +49,8 @@ public class DrinkingFountainController {
         drinkingFountainService.approveDrinkingFountain(id);
     }
 
+    @PostMapping("unapprove/{id}")
+    public void unapproveDrinkingFountain(@PathVariable int id) {
+        drinkingFountainService.unapproveDrinkingFountain(id);
+    }
 }
