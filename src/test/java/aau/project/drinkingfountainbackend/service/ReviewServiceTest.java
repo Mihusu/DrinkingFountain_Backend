@@ -53,9 +53,8 @@ public class ReviewServiceTest {
         List<String> base64 = new ArrayList<>();
         DrinkingFountainEntity.FountainType type = DrinkingFountainEntity.FountainType.DRINKING;
         int drinkingFountainId = 0;
-        ZonedDateTime specificCreatedAtReview = ZonedDateTime.parse("2023-01-01T00:00:00.000000+01:00[Europe/Copenhagen]");
 
-        ReviewRequestDTO reviewRequestDTO = new ReviewRequestDTO(text, stars, base64, type, drinkingFountainId, specificCreatedAtReview);
+        ReviewRequestDTO reviewRequestDTO = new ReviewRequestDTO(text, stars, base64, type, drinkingFountainId);
         Mockito.when(loginService.getUserById(0)).thenReturn(Optional.empty());
 
         MockHttpServletRequest request = new MockHttpServletRequest();
@@ -71,7 +70,6 @@ public class ReviewServiceTest {
         List<String> base64 = new ArrayList<>();
         DrinkingFountainEntity.FountainType type = DrinkingFountainEntity.FountainType.DRINKING;
         int drinkingFountainId = 0;
-        ZonedDateTime specificCreatedAtReview = ZonedDateTime.parse("2023-01-01T00:00:00.000000+01:00[Europe/Copenhagen]");
 
         // Attributes for user
         int id = 0;
@@ -88,7 +86,7 @@ public class ReviewServiceTest {
                 .createdAt(specificCreatedAtUser)
                 .build();
 
-        ReviewRequestDTO reviewRequestDTO = new ReviewRequestDTO(text, stars, base64, type, drinkingFountainId, specificCreatedAtReview);
+        ReviewRequestDTO reviewRequestDTO = new ReviewRequestDTO(text, stars, base64, type, drinkingFountainId);
         Mockito.when(loginService.getUserById(0)).thenReturn(Optional.of(user));
 
         MockHttpServletRequest request = new MockHttpServletRequest();
@@ -131,7 +129,7 @@ public class ReviewServiceTest {
 
             // Adding a String to the list
             stringList.add(picture);
-            ReviewRequestDTO reviewRequestDTO = new ReviewRequestDTO(text, stars, stringList, type, drinkingFountainId, specificCreatedAt);
+            ReviewRequestDTO reviewRequestDTO = new ReviewRequestDTO(text, stars, stringList, type, drinkingFountainId);
             Mockito.when(loginService.getUserById(0)).thenReturn(Optional.of(user));
 
             DrinkingFountainEntity fountainEntity = DrinkingFountainEntity.builder()

@@ -10,7 +10,6 @@ public record ReviewRequestDTO(
         int stars,
         List<String> base64Images,
         DrinkingFountainEntity.FountainType type,
-        int drinkingFountainId,
-        ZonedDateTime createAt) {
+        int drinkingFountainId) {
 
 }

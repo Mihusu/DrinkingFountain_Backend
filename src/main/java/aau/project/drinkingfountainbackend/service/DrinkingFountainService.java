@@ -70,8 +70,7 @@ public class DrinkingFountainService {
                 drinkingFountainRequestDTO.score(),
                 List.of(),
                 drinkingFountainRequestDTO.type(),
-                savedDrinkingFountain.getId(),
-                ZonedDateTime.now()
+                savedDrinkingFountain.getId()
         ), httpServletRequest);
     }
 
