@@ -61,6 +61,9 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                 .requestMatchers("/fountain/map").permitAll()
                 .requestMatchers("/fountain/info/{id}").permitAll()
                 .requestMatchers("/fountain/nearest/list").permitAll()
+                .requestMatchers("/fountain/unapproved").hasRole("ADMIN")
+                .requestMatchers("/approve/{id}").hasRole("ADMIN")
+                .requestMatchers("/unapprove/{id}").hasRole("ADMIN")
                 .anyRequest().authenticated());
 
         http.csrf(AbstractHttpConfigurer::disable);

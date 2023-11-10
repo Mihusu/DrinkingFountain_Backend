@@ -3,6 +3,7 @@ package aau.project.drinkingfountainbackend.service;
 import aau.project.drinkingfountainbackend.api.dto.UserDTO;
 import aau.project.drinkingfountainbackend.persistence.entity.UserEntity;
 import aau.project.drinkingfountainbackend.persistence.repository.UserRepository;
+import aau.project.drinkingfountainbackend.service.model.UserRoleInformation;
 import aau.project.drinkingfountainbackend.util.InvalidPasswordException;
 import aau.project.drinkingfountainbackend.util.InvalidUsernameException;
 import jakarta.transaction.Transactional;
@@ -49,7 +50,7 @@ public class LoginService {
         userRepository.save(userEntity);
     }
 
-    public Optional<Integer> login(UserDTO userDTO) {
+    public Optional<UserRoleInformation> login(UserDTO userDTO) {
         Optional<UserEntity> userEntity = userRepository.findFirstByName(userDTO.username());
 
         if (userEntity.isEmpty()) {
@@ -57,7 +58,7 @@ public class LoginService {
         }
 
         // Verify user exists and check if password match
-        return userEntity.filter(entity -> checkPassword(userDTO.password(), entity.getPassword())).map(UserEntity::getId);
+        return userEntity.filter(entity -> checkPassword(userDTO.password(), entity.getPassword())).map(user -> new UserRoleInformation(user.getId(),user.getRole()));
     }
 
     private boolean checkPassword(String inputPassword, String dataBasePassword) {
