@@ -29,8 +29,8 @@ public class UserController {
     @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody UserDTO userDTO) {
         return loginService.login(userDTO)
-                .map(userId -> {
-                    String token = jwtTokenService.generateToken(userId, "USER");
+                .map(userRoleInformation -> {
+                    String token = jwtTokenService.generateToken(userRoleInformation.userId(), userRoleInformation.roleType().name());
                     return new ResponseEntity<>("Bearer " + token, HttpStatus.OK);
                 })
                 .orElseGet(() -> new ResponseEntity<>(HttpStatus.UNAUTHORIZED));

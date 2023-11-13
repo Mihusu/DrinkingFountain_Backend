@@ -3,6 +3,7 @@ package aau.project.drinkingfountainbackend.service;
 import aau.project.drinkingfountainbackend.api.dto.UserDTO;
 import aau.project.drinkingfountainbackend.persistence.entity.UserEntity;
 import aau.project.drinkingfountainbackend.persistence.repository.UserRepository;
+import aau.project.drinkingfountainbackend.service.model.UserRoleInformation;
 import aau.project.drinkingfountainbackend.util.InvalidPasswordException;
 import aau.project.drinkingfountainbackend.util.InvalidUsernameException;
 import org.junit.jupiter.api.Assertions;
@@ -85,10 +86,11 @@ public class LoginServiceTest {
         Mockito.when(userRepository.findFirstByName(name)).thenReturn(Optional.of(user));
 
         UserDTO userDTO = new UserDTO(name, password);
-        Optional<Integer> userId = loginService.login(userDTO);
+        Optional<UserRoleInformation> userId = loginService.login(userDTO);
 
         Assertions.assertTrue(userId.isPresent());
-        Assertions.assertEquals(id, userId.get());
+        Assertions.assertEquals(id, userId.get().userId());
+        Assertions.assertEquals(UserEntity.RoleType.USER, userId.get().roleType());
     }
 
     @Test
@@ -97,7 +99,7 @@ public class LoginServiceTest {
         String password = "Jeff112233";
 
         UserDTO userDTO = new UserDTO(name, password);
-        Optional<Integer> userId = loginService.login(userDTO);
+        Optional<UserRoleInformation> userId = loginService.login(userDTO);
 
         Assertions.assertTrue(userId.isEmpty());
     }

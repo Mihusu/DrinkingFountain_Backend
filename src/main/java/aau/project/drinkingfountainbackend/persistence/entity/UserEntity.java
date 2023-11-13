@@ -27,7 +27,7 @@ public class UserEntity {
     private ZonedDateTime createdAt;
 
     public enum RoleType {
-        USER("USER"), ADMIN("AMID");
+        USER("USER"), ADMIN("ADMIN");
 
         RoleType(String name) {
         }
