@@ -6,6 +6,7 @@ import aau.project.drinkingfountainbackend.persistence.repository.UserRepository
 import aau.project.drinkingfountainbackend.service.model.UserRoleInformation;
 import aau.project.drinkingfountainbackend.util.InvalidPasswordException;
 import aau.project.drinkingfountainbackend.util.InvalidUsernameException;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,9 +20,12 @@ public class LoginService {
 
     private final UserRepository userRepository;
 
+    private final JwtTokenService jwtTokenService;
+
     @Autowired
-    public LoginService(UserRepository userRepository) {
+    public LoginService(UserRepository userRepository, JwtTokenService jwtTokenService) {
         this.userRepository = userRepository;
+        this.jwtTokenService = jwtTokenService;
     }
 
     protected Optional<UserEntity> getUserById(int id) {
@@ -59,6 +63,17 @@ public class LoginService {
 
         // Verify user exists and check if password match
         return userEntity.filter(entity -> checkPassword(userDTO.password(), entity.getPassword())).map(user -> new UserRoleInformation(user.getId(),user.getRole()));
+    }
+
+    public String getUsername(HttpServletRequest httpServletRequest) {
+        int userId = jwtTokenService.getUserIdFromToken(httpServletRequest);
+        Optional<UserEntity> userEntity = userRepository.findById(userId);
+
+        if (userEntity.isEmpty()) {
+            return "";
+        }
+
+        return userEntity.get().getName();
     }
 
     private boolean checkPassword(String inputPassword, String dataBasePassword) {

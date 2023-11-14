@@ -3,6 +3,7 @@ package aau.project.drinkingfountainbackend.api.controller;
 import aau.project.drinkingfountainbackend.api.dto.UserDTO;
 import aau.project.drinkingfountainbackend.service.JwtTokenService;
 import aau.project.drinkingfountainbackend.service.LoginService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,5 +35,10 @@ public class UserController {
                     return new ResponseEntity<>("Bearer " + token, HttpStatus.OK);
                 })
                 .orElseGet(() -> new ResponseEntity<>(HttpStatus.UNAUTHORIZED));
+    }
+
+    @GetMapping("/info")
+    public ResponseEntity<String> getUserInfo(HttpServletRequest httpServletRequest) {
+        return new ResponseEntity<>(loginService.getUsername(httpServletRequest), HttpStatus.OK);
     }
 }
