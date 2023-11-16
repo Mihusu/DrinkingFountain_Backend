@@ -61,6 +61,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                 .requestMatchers("/fountain/map").permitAll()
                 .requestMatchers("/fountain/info/{id}").permitAll()
                 .requestMatchers("/fountain/nearest/list").permitAll()
+                .requestMatchers("/auth/reset-password").permitAll()
                 .requestMatchers("/fountain/unapproved").hasRole("ADMIN")
                 .requestMatchers("/approve/{id}").hasRole("ADMIN")
                 .requestMatchers("/unapprove/{id}").hasRole("ADMIN")
