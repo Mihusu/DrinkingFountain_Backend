@@ -6,6 +6,8 @@ import aau.project.drinkingfountainbackend.persistence.repository.UserRepository
 import aau.project.drinkingfountainbackend.service.model.UserRoleInformation;
 import aau.project.drinkingfountainbackend.util.InvalidPasswordException;
 import aau.project.drinkingfountainbackend.util.InvalidUsernameException;
+import aau.project.drinkingfountainbackend.util.UsernameAlreadyExistException;
+import aau.project.drinkingfountainbackend.util.UsernameDoesNotExistException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import org.mindrot.jbcrypt.BCrypt;
@@ -34,6 +36,10 @@ public class LoginService {
 
     @Transactional
     public void registerUser(UserDTO userDTO) {
+        if(userRepository.findFirstByName(userDTO.username()).isPresent()) {
+            throw new UsernameAlreadyExistException();
+        }
+
         String hashedPassword = BCrypt.hashpw(userDTO.password(), BCrypt.gensalt());
 
         UserEntity userEntity = UserEntity.builder()
@@ -74,6 +80,17 @@ public class LoginService {
         }
 
         return userEntity.get().getName();
+    }
+
+    public void resetPassword(UserDTO userDTO) {
+
+        Optional<UserEntity> userEntity = userRepository.findFirstByName(userDTO.username());
+
+        if(userEntity.isEmpty()) {
+            throw new UsernameDoesNotExistException();
+        }
+
+        userEntity.get().setPassword(userDTO.password());
     }
 
     private boolean checkPassword(String inputPassword, String dataBasePassword) {
