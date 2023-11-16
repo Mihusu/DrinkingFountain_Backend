@@ -53,7 +53,7 @@ public class LoginService {
             throw new InvalidUsernameException();
         }
 
-        if (userDTO.password().length() < 8) {
+        if (checkPasswordRequirements(userDTO.password())) {
             throw new InvalidPasswordException();
         }
 
@@ -90,10 +90,18 @@ public class LoginService {
             throw new UsernameDoesNotExistException();
         }
 
+        if (checkPasswordRequirements(userDTO.password())) {
+            throw new InvalidPasswordException();
+        }
+
         userEntity.get().setPassword(userDTO.password());
     }
 
     private boolean checkPassword(String inputPassword, String dataBasePassword) {
         return BCrypt.checkpw(inputPassword, dataBasePassword);
+    }
+
+    private boolean checkPasswordRequirements(String password) {
+        return password.length() >= 8;
     }
 }
