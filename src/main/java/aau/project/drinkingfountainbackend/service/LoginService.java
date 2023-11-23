@@ -40,6 +40,14 @@ public class LoginService {
             throw new UsernameAlreadyExistException();
         }
 
+        if (userDTO.username() == null || userDTO.username().length() < 2) {
+            throw new InvalidUsernameException();
+        }
+
+        if (notValidPassword(userDTO.password())) {
+            throw new InvalidPasswordException();
+        }
+
         String hashedPassword = BCrypt.hashpw(userDTO.password(), BCrypt.gensalt());
 
         UserEntity userEntity = UserEntity.builder()
@@ -48,14 +56,6 @@ public class LoginService {
                 .createdAt(ZonedDateTime.now())
                 .role(UserEntity.RoleType.valueOf(UserEntity.RoleType.USER.name()))
                 .build();
-
-        if (userDTO.username() == null || userDTO.username().length() < 2) {
-            throw new InvalidUsernameException();
-        }
-
-        if (userDTO.password().length() < 8) {
-            throw new InvalidPasswordException();
-        }
 
         userRepository.save(userEntity);
     }
@@ -71,6 +71,7 @@ public class LoginService {
         return userEntity.filter(entity -> checkPassword(userDTO.password(), entity.getPassword())).map(user -> new UserRoleInformation(user.getId(),user.getRole()));
     }
 
+
     public String getUsername(HttpServletRequest httpServletRequest) {
         int userId = jwtTokenService.getUserIdFromToken(httpServletRequest);
         Optional<UserEntity> userEntity = userRepository.findById(userId);
@@ -83,11 +84,14 @@ public class LoginService {
     }
 
     public void resetPassword(UserDTO userDTO) {
-
         Optional<UserEntity> userEntity = userRepository.findFirstByName(userDTO.username());
 
         if(userEntity.isEmpty()) {
             throw new UsernameDoesNotExistException();
+        }
+
+        if (notValidPassword(userDTO.password())) {
+            throw new InvalidPasswordException();
         }
 
         userEntity.get().setPassword(userDTO.password());
@@ -95,5 +99,9 @@ public class LoginService {
 
     private boolean checkPassword(String inputPassword, String dataBasePassword) {
         return BCrypt.checkpw(inputPassword, dataBasePassword);
+    }
+
+    private boolean notValidPassword(String password) {
+        return password.length() < 8;
     }
 }
