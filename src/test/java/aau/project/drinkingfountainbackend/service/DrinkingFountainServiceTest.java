@@ -85,6 +85,16 @@ public class DrinkingFountainServiceTest {
     }
 
     @Test
+    void unapproveDrinkingFountainTest() {
+        int id = 2;
+
+        // Call the service method
+        drinkingFountainService.unapproveDrinkingFountain(id);
+
+        Mockito.verify(drinkingFountainRepository, Mockito.times(1)).deleteById(id);
+    }
+
+    @Test
     void getUnapprovedDrinkingFountainsWithDataTest() {
         //Attributes
         double latitude = 232.3232232;
@@ -168,5 +178,29 @@ public class DrinkingFountainServiceTest {
             Mockito.verify(drinkingFountainImageRepository, Mockito.times(1)).save(expectedFountainImageToBeSaved);
             Mockito.verify(drinkingFountainRepository, Mockito.times(1)).save(expectedFountainEntityToBeSaved);
         }
+    }
+
+    @Test
+    void getNearestDrinkingFountains() {
+        //Attributes
+        double latitude = 232.3232232;
+        double longitude = 53463.3552;
+        int score = 4;
+        DrinkingFountainEntity.FountainType type = DrinkingFountainEntity.FountainType.DRINKING;
+        ZonedDateTime specificCreatedAt = ZonedDateTime.parse("2023-01-01T00:00:00.000000+01:00[Europe/Copenhagen]");
+
+        // Mocking data
+        DrinkingFountainEntity fountainEntity = DrinkingFountainEntity.builder()
+                .latitude(latitude)
+                .longitude(longitude)
+                .type(type)
+                .createdAt(specificCreatedAt)
+                .approved(false)
+                .score(score)
+                .reviewEntities(List.of())
+                .fountainImageEntities(List.of())
+                .build();
+
+        drinkingFountainService.getNearestDrinkingFountains(fountainEntity.getLatitude(), fountainEntity.getLongitude());
     }
 }
