@@ -129,6 +129,23 @@ public class LoginServiceTest {
     }
 
     @Test
+    void getEmptyUsernameTest() {
+        int id = 1;
+
+        MockHttpServletRequest mockHttpServletRequest = new MockHttpServletRequest();
+        Mockito.when(jwtTokenService.getUserIdFromToken(mockHttpServletRequest)).thenReturn(id);
+
+        // Mock the behavior of userRepository.findById()
+        Mockito.when(userRepository.findById(id)).thenReturn(Optional.empty());
+
+        // Call the method you want to test
+        String username = loginService.getUsername(mockHttpServletRequest);
+
+        // Verify that the method behaves as expected
+        Assertions.assertEquals("", username);
+    }
+
+    @Test
     void resetPasswordTest() {
         int id = 0;
         String name = "Mihusu";
