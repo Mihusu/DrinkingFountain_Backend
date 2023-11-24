@@ -43,9 +43,6 @@ public class LoginServiceIT {
 
         userRepository.save(user);
 
-        ReflectionTestUtils.setField(jwtTokenService, "JWT_TOKEN_VALIDITY", 100000);
-        ReflectionTestUtils.setField(jwtTokenService, "secret", "abcdef");
-
         String token = jwtTokenService.generateToken(user.getId(), "ADMIN");
 
         // Create a real HttpServletRequest
