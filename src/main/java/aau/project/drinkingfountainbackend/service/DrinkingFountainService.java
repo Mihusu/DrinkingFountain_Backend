@@ -128,4 +128,5 @@ public class DrinkingFountainService {
     private FountainListViewDTO fountainListViewDTOMapper(DrinkingFountainListViewProjection projection) {
         return new FountainListViewDTO(projection.getId(), projection.getDistance(), projection.getLatitude(), projection.getLongitude(), projection.getType(), projection.getScore());
     }
+
 }
