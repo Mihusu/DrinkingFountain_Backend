@@ -26,9 +26,9 @@ public class DrinkingFountainEntity {
     private ZonedDateTime createdAt;
     private boolean approved;
     private double score;
-    @OneToMany(mappedBy = "drinkingFountain")
+    @OneToMany(mappedBy = "drinkingFountain", cascade = CascadeType.REMOVE)
     private List<DrinkingFountainImageEntity> fountainImageEntities;
-    @OneToMany(mappedBy = "drinkingFountain")
+    @OneToMany(mappedBy = "drinkingFountain", cascade = CascadeType.REMOVE)
     private List<ReviewEntity> reviewEntities;
 
     public enum FountainType {

@@ -3,7 +3,9 @@ package aau.project.drinkingfountainbackend.api.controller;
 import aau.project.drinkingfountainbackend.api.dto.DrinkingFountainMapDTO;
 import aau.project.drinkingfountainbackend.api.dto.DrinkingFountainRequestDTO;
 import aau.project.drinkingfountainbackend.api.dto.DrinkingFountainDTO;
+import aau.project.drinkingfountainbackend.api.dto.FountainListViewDTO;
 import aau.project.drinkingfountainbackend.service.DrinkingFountainService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +24,7 @@ public class DrinkingFountainController {
         this.drinkingFountainService = drinkingFountainService;
     }
 
-    @GetMapping("{id}")
+    @GetMapping("/info/{id}")
     public ResponseEntity<DrinkingFountainDTO> getDrinkingFountain(@PathVariable int id){
         return drinkingFountainService.getDrinkingFountain(id)
                 .map(drinkingFountainDTO -> new ResponseEntity<>(drinkingFountainDTO, HttpStatus.OK))
@@ -30,8 +32,8 @@ public class DrinkingFountainController {
     }
 
     @GetMapping("/map")
-    public ResponseEntity<List<DrinkingFountainMapDTO>> getDrinkingFountainMapData(){
-        return new ResponseEntity<>(drinkingFountainService.getDrinkingFountainMapData(), HttpStatus.OK);
+    public ResponseEntity<List<DrinkingFountainMapDTO>> getDrinkingFountainMapData(@RequestParam double latitude, @RequestParam double longitude){
+        return new ResponseEntity<>(drinkingFountainService.getDrinkingFountainMapData(latitude, longitude), HttpStatus.OK);
     }
 
     @GetMapping("/unapproved")
@@ -40,8 +42,8 @@ public class DrinkingFountainController {
     }
 
     @PostMapping("/request")
-    public void createNewFountainRequest(@RequestBody DrinkingFountainRequestDTO drinkingFountainRequestDTO){
-        drinkingFountainService.saveDrinkingFountainRequest(drinkingFountainRequestDTO);
+    public void createNewFountainRequest(@RequestBody DrinkingFountainRequestDTO drinkingFountainRequestDTO, HttpServletRequest httpServletRequest){
+        drinkingFountainService.saveDrinkingFountainRequest(drinkingFountainRequestDTO, httpServletRequest);
     }
 
     @PostMapping("approve/{id}")
@@ -49,4 +51,14 @@ public class DrinkingFountainController {
         drinkingFountainService.approveDrinkingFountain(id);
     }
 
+    @GetMapping("/nearest/list")
+    public ResponseEntity<List<FountainListViewDTO>> getNearestFountains(@RequestParam double latitude, @RequestParam double longitude){
+        List<FountainListViewDTO> fountains = drinkingFountainService.getNearestDrinkingFountains(latitude, longitude);
+        return new ResponseEntity<>(fountains, HttpStatus.OK);
+    }
+
+    @PostMapping("unapprove/{id}")
+    public void unapproveDrinkingFountain(@PathVariable int id) {
+        drinkingFountainService.unapproveDrinkingFountain(id);
+    }
 }

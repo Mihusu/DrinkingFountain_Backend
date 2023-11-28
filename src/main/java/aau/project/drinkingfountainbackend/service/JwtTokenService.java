@@ -10,6 +10,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
+
 import java.io.Serializable;
 import java.util.*;
 import java.util.function.Function;
@@ -43,7 +44,7 @@ public class JwtTokenService implements Serializable {
         return doGenerateToken(String.valueOf(userId), role);
     }
 
-    public String doGenerateToken(String userId, String role) {
+    private String doGenerateToken(String userId, String role) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("role", role); // Add the role as a claim
 

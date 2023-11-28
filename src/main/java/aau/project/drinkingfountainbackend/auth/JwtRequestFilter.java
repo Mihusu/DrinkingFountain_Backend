@@ -7,7 +7,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.core.Authentication;
@@ -23,6 +22,7 @@ import java.io.IOException;
 public class JwtRequestFilter extends OncePerRequestFilter {
 
     private final JwtTokenService jwtTokenService;
+    private final String ADMIN_ROLE = "ADMIN";
 
     @Autowired
     public JwtRequestFilter(JwtTokenService jwtTokenService) {
@@ -41,8 +41,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         } catch (Exception e){
-            response.setStatus(HttpStatus.UNAUTHORIZED.value());
-            return;
+            //Maybe log the failed jwt check
         }
         filterChain.doFilter(request, response);
     }
@@ -61,7 +60,12 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         http.authorizeHttpRequests(auth -> auth
                 .requestMatchers("/auth/**").permitAll()
                 .requestMatchers("/fountain/map").permitAll()
-                .requestMatchers("/fountain/{id}").permitAll()
+                .requestMatchers("/fountain/info/{id}").permitAll()
+                .requestMatchers("/fountain/nearest/list").permitAll()
+                .requestMatchers("/auth/reset-password").permitAll()
+                .requestMatchers("/fountain/unapproved").hasRole(ADMIN_ROLE)
+                .requestMatchers("/approve/{id}").hasRole(ADMIN_ROLE)
+                .requestMatchers("/unapprove/{id}").hasRole(ADMIN_ROLE)
                 .anyRequest().authenticated());
 
         http.csrf(AbstractHttpConfigurer::disable);
