@@ -3,25 +3,34 @@ package aau.project.drinkingfountainbackend.service;
 import aau.project.drinkingfountainbackend.EnableTestcontainers;
 import aau.project.drinkingfountainbackend.api.dto.DrinkingFountainDTO;
 import aau.project.drinkingfountainbackend.api.dto.DrinkingFountainMapDTO;
+import aau.project.drinkingfountainbackend.api.dto.DrinkingFountainRequestDTO;
 import aau.project.drinkingfountainbackend.api.dto.FountainListViewDTO;
 import aau.project.drinkingfountainbackend.persistence.entity.DrinkingFountainEntity;
+import aau.project.drinkingfountainbackend.persistence.entity.UserEntity;
 import aau.project.drinkingfountainbackend.persistence.repository.DrinkingFountainImageRepository;
 import aau.project.drinkingfountainbackend.persistence.repository.DrinkingFountainRepository;
 import aau.project.drinkingfountainbackend.persistence.repository.UserRepository;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletRequestWrapper;
+import jakarta.servlet.*;
+import jakarta.servlet.http.*;
 import jakarta.transaction.Transactional;
+import org.junit.Before;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 
 import javax.swing.text.html.Option;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.security.Principal;
 import java.time.ZonedDateTime;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -33,7 +42,10 @@ public class DrinkingFountainServiceIT {
     DrinkingFountainImageRepository drinkingFountainImageRepository;
     @Autowired
     DrinkingFountainService drinkingFountainService;
-
+    @Autowired
+    UserRepository userRepository;
+    @Autowired
+    JwtTokenService jwtTokenService;
 
     @Transactional
     @Test
@@ -101,30 +113,45 @@ public class DrinkingFountainServiceIT {
     @Test
     void saveDrinkingFountainRequestIT() {
 
-        DrinkingFountainDTO drinkingFountainDTO = new DrinkingFountainDTO(
-                1234,
+        DrinkingFountainRequestDTO drinkingFountainRequestDTO = new DrinkingFountainRequestDTO(
                 1234.5678,
                 1234.5678,
                 DrinkingFountainEntity.FountainType.valueOf("DRINKING"),
-                ZonedDateTime.now(),
-                5.0,
-                List.of(),
-                List.of()
-        );
+                "",
+                5,
+                "");
 
-        // TODO: pass HttpServletRequest
-        //drinkingFountainService.saveDrinkingFountainRequest(drinkingFountainDTO, /*httpServletRequest*/);
+        UserEntity user = UserEntity.builder()
+                .name("Jerf")
+                .password("jerf123456")
+                .role(UserEntity.RoleType.ADMIN)
+                .createdAt(ZonedDateTime.now())
+                .build();
 
-        Optional<DrinkingFountainEntity> drinkingFountainEntity = drinkingFountainRepository.getFirstByIdAndApproved(drinkingFountainDTO.id(), true);
+        userRepository.save(user);
 
-        Assertions.assertTrue(drinkingFountainEntity.isPresent());
+        String token = jwtTokenService.generateToken(user.getId(), "ADMIN");
+
+        // Create a mocked HttpServletRequest
+        MockHttpServletRequest mockHttpServletRequest = new MockHttpServletRequest();
+        mockHttpServletRequest.addHeader("Authorization", "Bearer " + token);
+
+        drinkingFountainService.saveDrinkingFountainRequest(drinkingFountainRequestDTO, mockHttpServletRequest);
+
+        List<DrinkingFountainEntity> drinkingFountainEntityList = drinkingFountainRepository.findAll();
+        DrinkingFountainEntity drinkingFountainEntity = drinkingFountainEntityList.get(0);
+
+        Assertions.assertEquals(1, drinkingFountainEntityList.size());
+        Assertions.assertEquals(drinkingFountainRequestDTO.latitude(), drinkingFountainEntity.getLatitude());
+        Assertions.assertEquals(drinkingFountainRequestDTO.longitude(), drinkingFountainEntity.getLongitude());
+        Assertions.assertEquals(drinkingFountainRequestDTO.score(), drinkingFountainEntity.getScore());
+        Assertions.assertEquals(drinkingFountainRequestDTO.type(), drinkingFountainEntity.getType());
     }
 
     @Transactional
     @Test
     void approveDrinkingFountainIT() {
         DrinkingFountainEntity drinkingFountainEntity = DrinkingFountainEntity.builder()
-                .id(1234)
                 .score(5)
                 .type(DrinkingFountainEntity.FountainType.valueOf("DRINKING"))
                 .latitude(123456)
@@ -179,7 +206,7 @@ public class DrinkingFountainServiceIT {
                 .latitude(123456)
                 .longitude(123456)
                 .createdAt(ZonedDateTime.now())
-                .approved(true)
+                .approved(false)
                 .fountainImageEntities(List.of())
                 .reviewEntities(List.of())
                 .build();
@@ -196,13 +223,10 @@ public class DrinkingFountainServiceIT {
     @Test
     void getNearestDrinkingFountainsIT() {
 
-        List<DrinkingFountainEntity> drinkingFountainEntityList;
-
         double testLatitude = 50.0000;
         double testLongitude = 20.0000;
 
-        DrinkingFountainEntity drinkingFountainEntity1 = DrinkingFountainEntity.builder()
-                .id(1)
+        DrinkingFountainEntity df1 = DrinkingFountainEntity.builder()
                 .score(5)
                 .type(DrinkingFountainEntity.FountainType.valueOf("DRINKING"))
                 .latitude(testLatitude + 0.0001)
@@ -213,8 +237,7 @@ public class DrinkingFountainServiceIT {
                 .reviewEntities(List.of())
                 .build();
 
-        DrinkingFountainEntity drinkingFountainEntity2 = DrinkingFountainEntity.builder()
-                .id(2)
+        DrinkingFountainEntity df2 = DrinkingFountainEntity.builder()
                 .score(5)
                 .type(DrinkingFountainEntity.FountainType.valueOf("DRINKING"))
                 .latitude(testLatitude + 0.0002)
@@ -225,8 +248,7 @@ public class DrinkingFountainServiceIT {
                 .reviewEntities(List.of())
                 .build();
 
-        DrinkingFountainEntity drinkingFountainEntity3 = DrinkingFountainEntity.builder()
-                .id(3)
+        DrinkingFountainEntity df3 = DrinkingFountainEntity.builder()
                 .score(5)
                 .type(DrinkingFountainEntity.FountainType.valueOf("DRINKING"))
                 .latitude(testLatitude + 0.0003)
@@ -237,8 +259,7 @@ public class DrinkingFountainServiceIT {
                 .reviewEntities(List.of())
                 .build();
 
-        DrinkingFountainEntity drinkingFountainEntity4 = DrinkingFountainEntity.builder()
-                .id(4)
+        DrinkingFountainEntity df4 = DrinkingFountainEntity.builder()
                 .score(5)
                 .type(DrinkingFountainEntity.FountainType.valueOf("DRINKING"))
                 .latitude(testLatitude + 0.0004)
@@ -249,8 +270,7 @@ public class DrinkingFountainServiceIT {
                 .reviewEntities(List.of())
                 .build();
 
-        DrinkingFountainEntity drinkingFountainEntity5 = DrinkingFountainEntity.builder()
-                .id(5)
+        DrinkingFountainEntity df5 = DrinkingFountainEntity.builder()
                 .score(5)
                 .type(DrinkingFountainEntity.FountainType.valueOf("DRINKING"))
                 .latitude(testLatitude + 0.0005)
@@ -261,8 +281,7 @@ public class DrinkingFountainServiceIT {
                 .reviewEntities(List.of())
                 .build();
 
-        DrinkingFountainEntity drinkingFountainEntity6 = DrinkingFountainEntity.builder()
-                .id(6)
+        DrinkingFountainEntity df6 = DrinkingFountainEntity.builder()
                 .score(5)
                 .type(DrinkingFountainEntity.FountainType.valueOf("DRINKING"))
                 .latitude(testLatitude + 0.0006)
@@ -273,19 +292,25 @@ public class DrinkingFountainServiceIT {
                 .reviewEntities(List.of())
                 .build();
 
-        drinkingFountainRepository.saveAll(Arrays.asList(
-                drinkingFountainEntity1,
-                drinkingFountainEntity2,
-                drinkingFountainEntity3,
-                drinkingFountainEntity4,
-                drinkingFountainEntity5,
-                drinkingFountainEntity6));
+        System.out.print("There are ");
+        System.out.print(drinkingFountainService.getNearestDrinkingFountains(testLatitude, testLongitude).size());
+        System.out.print(" fountains in the repository");
+        System.out.println();
+
+        drinkingFountainRepository.saveAll(Arrays.asList(df1, df2, df3, df4, df5, df6));
+
+        System.out.print("There are ");
+        System.out.print(drinkingFountainService.getNearestDrinkingFountains(testLatitude, testLongitude).size());
+        System.out.print(" fountains in the repository");
+        System.out.println();
+
 
         List<FountainListViewDTO> fountainListViewDTOS = drinkingFountainService.getNearestDrinkingFountains(testLatitude, testLongitude);
 
         Assertions.assertEquals(5, fountainListViewDTOS.size());
+        Assertions.assertEquals(fountainListViewDTOS.get(0).id(), df1.getId());
         Assertions.assertFalse(fountainListViewDTOS.contains(drinkingFountainRepository.getFirstByIdAndApproved(6, true)));
-
     }
+
 
 }
