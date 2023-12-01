@@ -68,7 +68,6 @@ public class DrinkingFountainService {
         reviewService.addReview(new ReviewRequestDTO(
                 drinkingFountainRequestDTO.review(),
                 drinkingFountainRequestDTO.score(),
-                List.of(),
                 drinkingFountainRequestDTO.type(),
                 savedDrinkingFountain.getId()
         ), httpServletRequest);

@@ -6,7 +6,6 @@ import java.util.List;
 public record ReviewRequestDTO(
         String text,
         int stars,
-        List<String> base64Images,
         DrinkingFountainEntity.FountainType type,
         int drinkingFountainId) {
 

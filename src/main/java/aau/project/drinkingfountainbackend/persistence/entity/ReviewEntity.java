@@ -27,7 +27,7 @@ public class ReviewEntity {
     private DrinkingFountainEntity.FountainType type;
 
     @ManyToOne
-    @JoinColumn(name="user_id", nullable=false)
+    @JoinColumn(name="user_id", nullable = false)
     private UserEntity userEntity;
 
     @ManyToOne
