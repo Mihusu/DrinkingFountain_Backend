@@ -9,8 +9,6 @@ import aau.project.drinkingfountainbackend.persistence.repository.DrinkingFounta
 import aau.project.drinkingfountainbackend.persistence.repository.ReviewRepository;
 import aau.project.drinkingfountainbackend.persistence.repository.UserRepository;
 import jakarta.transaction.Transactional;
-import org.apache.catalina.User;
-import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,32 +46,6 @@ public class ReviewServiceIT {
     @Test
     @Transactional
     void addReviewIT() {
-        UserEntity userEntity = UserEntity.builder()
-                .role(UserEntity.RoleType.ADMIN)
-                .password("jerf1234")
-                .name("Jerfer")
-                .build();
-
-        DrinkingFountainEntity drinkingFountainEntity = DrinkingFountainEntity.builder()
-                .latitude(0.001)
-                .longitude(0.001)
-                .type(DrinkingFountainEntity.FountainType.DRINKING)
-                .createdAt(ZonedDateTime.now())
-                .approved(true)
-                .score(5.0)
-                .fountainImageEntities(List.of())
-                .reviewEntities(List.of())
-                .build();
-
-        DrinkingFountainEntity insertedDrinkingFountain = drinkingFountainRepository.save(drinkingFountainEntity);
-
-        ReviewRequestDTO reviewRequestDTO = new ReviewRequestDTO(
-            "review request text",
-                5,
-                DrinkingFountainEntity.FountainType.DRINKING,
-                insertedDrinkingFountain.getId()
-        );
-
         UserEntity user = UserEntity.builder()
                 .name("Jerf")
                 .password("jerf123456")
@@ -83,23 +55,34 @@ public class ReviewServiceIT {
 
         userRepository.save(user);
 
+        DrinkingFountainEntity drinkingFountainEntity = DrinkingFountainEntity.builder()
+                .latitude(0.001)
+                .longitude(0.001)
+                .type(DrinkingFountainEntity.FountainType.DRINKING)
+                .createdAt(ZonedDateTime.now())
+                .approved(true)
+                .score(2)
+                .build();
+
+        drinkingFountainRepository.save(drinkingFountainEntity);
+
         String token = jwtTokenService.generateToken(user.getId(), "ADMIN");
 
         // Create a mocked HttpServletRequest
         MockHttpServletRequest mockHttpServletRequest = new MockHttpServletRequest();
         mockHttpServletRequest.addHeader("Authorization", "Bearer " + token);
 
-        reviewService.addReview(reviewRequestDTO, mockHttpServletRequest);
+        Optional<DrinkingFountainEntity> insertedDrinkingFountain = drinkingFountainRepository.getFirstByIdAndApproved(1, true);
 
-        //
-        //Optional<ReviewEntity> inserted = reviewRepository.findById();
+        reviewService.addReview(new ReviewRequestDTO(
+                "text",
+                2,
+                DrinkingFountainEntity.FountainType.DRINKING,
+                insertedDrinkingFountain.get().getId()
+        ), mockHttpServletRequest);
 
-        Optional<DrinkingFountainEntity> fountainEntity = drinkingFountainRepository.getFirstByIdAndApproved(insertedDrinkingFountain.getId(), true);
+        List<ReviewEntity> reviews = reviewRepository.findAll();
 
-        //Assertions.assertTrue(fountainEntity.isPresent());
-
-        Assertions.assertTrue(fountainEntity.isPresent());
-        List<ReviewEntity> reviewEntities = fountainEntity.get().getReviewEntities();
-        Assertions.assertEquals(reviewRequestDTO.text(), reviewEntities.get(0).getText());
+        Assertions.assertEquals(insertedDrinkingFountain.get().getId(), reviews.get(0).getDrinkingFountain().getId());
     }
 }
