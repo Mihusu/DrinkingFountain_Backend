@@ -88,17 +88,12 @@ public class DrinkingFountainService {
     }
 
     private DrinkingFountainDTO drinkingFountainDTOMapper(DrinkingFountainEntity entity) {
-        List<ReviewDTO> reviewDTOS = entity.getReviewEntities().stream().map(reviewEntity -> {
-            List<ReviewImageDTO> reviewImages = reviewEntity.getReviewImages().stream().map(
-                    reviewImageEntity -> new ReviewImageDTO(Base64Utility.encode(reviewImageEntity.getImage()))).toList();
-            return new ReviewDTO(
-                    reviewEntity.getText(),
-                    reviewEntity.getStars(),
-                    reviewImages,
-                    reviewEntity.getType(),
-                    reviewEntity.getUserEntity().getName(),
-                    reviewEntity.getCreatedAt());
-        }).toList();
+        List<ReviewDTO> reviewDTOS = entity.getReviewEntities().stream().map(reviewEntity -> new ReviewDTO(
+                reviewEntity.getText(),
+                reviewEntity.getStars(),
+                reviewEntity.getType(),
+                reviewEntity.getUserEntity().getName(),
+                reviewEntity.getCreatedAt())).toList();
 
         List<FountainImageDTO> fountainImageDTOS = entity.getFountainImageEntities().stream().map(
                 //Turn each entity into a DTO
