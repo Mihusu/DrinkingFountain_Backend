@@ -3,7 +3,9 @@ package aau.project.drinkingfountainbackend.service;
 import aau.project.drinkingfountainbackend.api.dto.ReviewRequestDTO;
 import aau.project.drinkingfountainbackend.persistence.entity.DrinkingFountainEntity;
 import aau.project.drinkingfountainbackend.persistence.entity.ReviewEntity;
+import aau.project.drinkingfountainbackend.persistence.entity.ReviewsScoreSumProjectionMock;
 import aau.project.drinkingfountainbackend.persistence.entity.UserEntity;
+import aau.project.drinkingfountainbackend.persistence.projection.ReviewsScoreSumProjection;
 import aau.project.drinkingfountainbackend.persistence.repository.DrinkingFountainRepository;
 import aau.project.drinkingfountainbackend.persistence.repository.ReviewRepository;
 import org.junit.jupiter.api.Assertions;
@@ -139,6 +141,9 @@ public class ReviewServiceTest {
                     .build();
 
             Mockito.when(drinkingFountainRepository.findById(reviewRequestDTO.drinkingFountainId())).thenReturn(Optional.of(fountainEntity));
+
+            ReviewsScoreSumProjection mockedProjection = ReviewsScoreSumProjectionMock.createMock(6, 2);
+            Mockito.when(reviewRepository.getReviewSumAndCount(id)).thenReturn(mockedProjection);
 
             ReviewEntity reviewEntity = ReviewEntity.builder()
                     .text(reviewRequestDTO.text())
