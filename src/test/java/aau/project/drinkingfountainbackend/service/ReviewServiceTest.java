@@ -3,10 +3,8 @@ package aau.project.drinkingfountainbackend.service;
 import aau.project.drinkingfountainbackend.api.dto.ReviewRequestDTO;
 import aau.project.drinkingfountainbackend.persistence.entity.DrinkingFountainEntity;
 import aau.project.drinkingfountainbackend.persistence.entity.ReviewEntity;
-import aau.project.drinkingfountainbackend.persistence.entity.ReviewImageEntity;
 import aau.project.drinkingfountainbackend.persistence.entity.UserEntity;
 import aau.project.drinkingfountainbackend.persistence.repository.DrinkingFountainRepository;
-import aau.project.drinkingfountainbackend.persistence.repository.ReviewImageRepository;
 import aau.project.drinkingfountainbackend.persistence.repository.ReviewRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -29,9 +27,6 @@ public class ReviewServiceTest {
 
     @Mock
     private ReviewRepository reviewRepository;
-
-    @Mock
-    private ReviewImageRepository reviewImageRepository;
 
     @Mock
     private JwtTokenService jwtTokenService;
@@ -148,16 +143,11 @@ public class ReviewServiceTest {
             ReviewEntity reviewEntity = ReviewEntity.builder()
                     .text(reviewRequestDTO.text())
                     .stars(reviewRequestDTO.stars())
-                    .reviewImages(List.of())
                     .type(reviewRequestDTO.type())
                     .userEntity(user)
                     .createdAt(specificCreatedAt)
                     .drinkingFountain(fountainEntity)
                     .build();
-
-            List<ReviewImageEntity> reviewImageEntities = new ArrayList<>();
-            ReviewImageEntity reviewImageEntity = new ReviewImageEntity(id, Base64.getDecoder().decode(picture), specificCreatedAt, reviewEntity);
-            reviewImageEntities.add(reviewImageEntity);
 
             Mockito.when(reviewRepository.save(Mockito.any())).thenReturn(reviewEntity);
 
@@ -165,7 +155,6 @@ public class ReviewServiceTest {
             reviewService.addReview(reviewRequestDTO, request);
 
             Mockito.verify(reviewRepository, Mockito.times(1)).save(reviewEntity);
-            Mockito.verify(reviewImageRepository, Mockito.times(1)).saveAll(reviewImageEntities);
         }
     }
 }

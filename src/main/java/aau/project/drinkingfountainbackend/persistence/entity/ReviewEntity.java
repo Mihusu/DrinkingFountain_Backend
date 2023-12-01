@@ -7,7 +7,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.ZonedDateTime;
-import java.util.List;
 
 @Data // Generates getters and setters
 @NoArgsConstructor
@@ -22,8 +21,6 @@ public class ReviewEntity {
     private int id;
     private String text;
     private int stars;
-    @OneToMany(mappedBy = "review", cascade = CascadeType.ALL)
-    private List<ReviewImageEntity> reviewImages;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "fountain_type")
