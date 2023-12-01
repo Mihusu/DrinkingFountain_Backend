@@ -22,6 +22,7 @@ import java.io.IOException;
 public class JwtRequestFilter extends OncePerRequestFilter {
 
     private final JwtTokenService jwtTokenService;
+    private final String ADMIN_ROLE = "ADMIN";
 
     @Autowired
     public JwtRequestFilter(JwtTokenService jwtTokenService) {
@@ -62,9 +63,9 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                 .requestMatchers("/fountain/info/{id}").permitAll()
                 .requestMatchers("/fountain/nearest/list").permitAll()
                 .requestMatchers("/auth/reset-password").permitAll()
-                .requestMatchers("/fountain/unapproved").hasRole("ADMIN")
-                .requestMatchers("/approve/{id}").hasRole("ADMIN")
-                .requestMatchers("/unapprove/{id}").hasRole("ADMIN")
+                .requestMatchers("/fountain/unapproved").hasRole(ADMIN_ROLE)
+                .requestMatchers("/approve/{id}").hasRole(ADMIN_ROLE)
+                .requestMatchers("/unapprove/{id}").hasRole(ADMIN_ROLE)
                 .anyRequest().authenticated());
 
         http.csrf(AbstractHttpConfigurer::disable);
