@@ -49,10 +49,6 @@ public class LoginServiceIT {
         MockHttpServletRequest httpServletRequest = new MockHttpServletRequest();
         httpServletRequest.addHeader("Authorization", "Bearer " + token);
 
-        jwtTokenService.getUserIdFromToken(httpServletRequest);
-
-        userRepository.findById(user.getId());
-
         String getUsername = loginService.getUsername(httpServletRequest);
 
         Assertions.assertEquals(user.getName(), getUsername);

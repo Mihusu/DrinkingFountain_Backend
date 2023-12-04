@@ -68,7 +68,6 @@ public class DrinkingFountainService {
         reviewService.addReview(new ReviewRequestDTO(
                 drinkingFountainRequestDTO.review(),
                 drinkingFountainRequestDTO.score(),
-                List.of(),
                 drinkingFountainRequestDTO.type(),
                 savedDrinkingFountain.getId()
         ), httpServletRequest);
@@ -123,4 +122,5 @@ public class DrinkingFountainService {
     private FountainListViewDTO fountainListViewDTOMapper(DrinkingFountainListViewProjection projection) {
         return new FountainListViewDTO(projection.getId(), projection.getDistance(), projection.getLatitude(), projection.getLongitude(), projection.getType(), projection.getScore());
     }
+
 }
