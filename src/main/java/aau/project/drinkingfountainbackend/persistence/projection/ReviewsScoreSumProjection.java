@@ -1,6 +1,8 @@
 package aau.project.drinkingfountainbackend.persistence.projection;
 
+import java.util.Optional;
+
 public interface ReviewsScoreSumProjection {
-    int getSum();
-    int getCount();
+    Optional<Integer> getSum();
+    Optional<Integer> getCount();
 }

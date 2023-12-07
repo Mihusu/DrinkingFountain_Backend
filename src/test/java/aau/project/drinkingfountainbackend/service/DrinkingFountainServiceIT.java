@@ -10,24 +10,14 @@ import aau.project.drinkingfountainbackend.persistence.entity.UserEntity;
 import aau.project.drinkingfountainbackend.persistence.repository.DrinkingFountainImageRepository;
 import aau.project.drinkingfountainbackend.persistence.repository.DrinkingFountainRepository;
 import aau.project.drinkingfountainbackend.persistence.repository.UserRepository;
-import jakarta.servlet.*;
-import jakarta.servlet.http.*;
 import jakarta.transaction.Transactional;
-import org.junit.Before;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockHttpServletRequest;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 
-import javax.swing.text.html.Option;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.security.Principal;
 import java.time.ZonedDateTime;
 import java.util.*;
 
@@ -311,6 +301,4 @@ public class DrinkingFountainServiceIT {
         Assertions.assertEquals(fountainListViewDTOS.get(0).id(), df1.getId());
         Assertions.assertFalse(fountainListViewDTOS.contains(drinkingFountainRepository.getFirstByIdAndApproved(6, true)));
     }
-
-
 }

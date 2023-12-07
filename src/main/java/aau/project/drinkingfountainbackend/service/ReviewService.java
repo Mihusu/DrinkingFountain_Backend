@@ -45,8 +45,14 @@ public class ReviewService {
         }
 
         ReviewsScoreSumProjection result = reviewRepository.getReviewSumAndCount(drinkingFountainEntity.get().getId());
-        double newScore = (reviewRequestDTO.stars() + result.getSum()) / (result.getCount() + 1d);
-        drinkingFountainEntity.get().setScore(newScore);
+
+        double score = reviewRequestDTO.stars();
+
+        if(result.getSum().isPresent() && result.getCount().isPresent()){
+               score = reviewRequestDTO.stars() + result.getSum().get() / (result.getCount().get() + 1d);
+        }
+
+        drinkingFountainEntity.get().setScore(score);
 
         ReviewEntity reviewEntity = ReviewEntity.builder()
                 .text(reviewRequestDTO.text())
