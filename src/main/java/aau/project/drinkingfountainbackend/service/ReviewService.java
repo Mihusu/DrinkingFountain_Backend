@@ -2,6 +2,7 @@ package aau.project.drinkingfountainbackend.service;
 
 import aau.project.drinkingfountainbackend.api.dto.ReviewRequestDTO;
 import aau.project.drinkingfountainbackend.persistence.entity.*;
+import aau.project.drinkingfountainbackend.persistence.projection.ReviewsScoreSumProjection;
 import aau.project.drinkingfountainbackend.persistence.repository.DrinkingFountainRepository;
 import aau.project.drinkingfountainbackend.persistence.repository.ReviewRepository;
 import jakarta.servlet.http.HttpServletRequest;
@@ -38,9 +39,14 @@ public class ReviewService {
 
         Optional<DrinkingFountainEntity> drinkingFountainEntity = drinkingFountainRepository.findById(reviewRequestDTO.drinkingFountainId());
 
+
         if (drinkingFountainEntity.isEmpty()) {
             throw new NoSuchElementException("Drinking fountain not found in database");
         }
+
+        ReviewsScoreSumProjection result = reviewRepository.getReviewSumAndCount(drinkingFountainEntity.get().getId());
+        double newScore = (reviewRequestDTO.stars() + result.getSum()) / (result.getCount() + 1d);
+        drinkingFountainEntity.get().setScore(newScore);
 
         ReviewEntity reviewEntity = ReviewEntity.builder()
                 .text(reviewRequestDTO.text())
