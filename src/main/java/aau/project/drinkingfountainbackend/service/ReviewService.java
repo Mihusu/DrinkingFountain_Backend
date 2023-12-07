@@ -49,7 +49,7 @@ public class ReviewService {
         double score = reviewRequestDTO.stars();
 
         if(result.getSum().isPresent() && result.getCount().isPresent()){
-               score = reviewRequestDTO.stars() + result.getSum().get() / (result.getCount().get() + 1d);
+               score = (reviewRequestDTO.stars() + result.getSum().get()) / (result.getCount().get() + 1d);
         }
 
         drinkingFountainEntity.get().setScore(score);
