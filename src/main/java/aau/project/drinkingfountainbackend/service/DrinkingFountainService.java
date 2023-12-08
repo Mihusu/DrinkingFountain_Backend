@@ -55,7 +55,6 @@ public class DrinkingFountainService {
                 .score(drinkingFountainRequestDTO.score())
                 .createdAt(ZonedDateTime.now())
                 .approved(false)
-                .score(drinkingFountainRequestDTO.score())
                 .build()
         );
 
