@@ -3,10 +3,10 @@ package aau.project.drinkingfountainbackend.service;
 import aau.project.drinkingfountainbackend.api.dto.ReviewRequestDTO;
 import aau.project.drinkingfountainbackend.persistence.entity.DrinkingFountainEntity;
 import aau.project.drinkingfountainbackend.persistence.entity.ReviewEntity;
-import aau.project.drinkingfountainbackend.persistence.entity.ReviewImageEntity;
+import aau.project.drinkingfountainbackend.persistence.entity.ReviewsScoreSumProjectionMock;
 import aau.project.drinkingfountainbackend.persistence.entity.UserEntity;
+import aau.project.drinkingfountainbackend.persistence.projection.ReviewsScoreSumProjection;
 import aau.project.drinkingfountainbackend.persistence.repository.DrinkingFountainRepository;
-import aau.project.drinkingfountainbackend.persistence.repository.ReviewImageRepository;
 import aau.project.drinkingfountainbackend.persistence.repository.ReviewRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -31,9 +31,6 @@ public class ReviewServiceTest {
     private ReviewRepository reviewRepository;
 
     @Mock
-    private ReviewImageRepository reviewImageRepository;
-
-    @Mock
     private JwtTokenService jwtTokenService;
 
     @Mock
@@ -50,11 +47,10 @@ public class ReviewServiceTest {
         // Attributes for review
         String text = "My first drinking fountain review";
         int stars = 4;
-        List<String> base64 = new ArrayList<>();
         DrinkingFountainEntity.FountainType type = DrinkingFountainEntity.FountainType.DRINKING;
         int drinkingFountainId = 0;
 
-        ReviewRequestDTO reviewRequestDTO = new ReviewRequestDTO(text, stars, base64, type, drinkingFountainId);
+        ReviewRequestDTO reviewRequestDTO = new ReviewRequestDTO(text, stars, type, drinkingFountainId);
         Mockito.when(loginService.getUserById(0)).thenReturn(Optional.empty());
 
         MockHttpServletRequest request = new MockHttpServletRequest();
@@ -67,7 +63,6 @@ public class ReviewServiceTest {
         // Attributes for review
         String text = "My first drinking fountain review";
         int stars = 4;
-        List<String> base64 = new ArrayList<>();
         DrinkingFountainEntity.FountainType type = DrinkingFountainEntity.FountainType.DRINKING;
         int drinkingFountainId = 0;
 
@@ -86,7 +81,7 @@ public class ReviewServiceTest {
                 .createdAt(specificCreatedAtUser)
                 .build();
 
-        ReviewRequestDTO reviewRequestDTO = new ReviewRequestDTO(text, stars, base64, type, drinkingFountainId);
+        ReviewRequestDTO reviewRequestDTO = new ReviewRequestDTO(text, stars, type, drinkingFountainId);
         Mockito.when(loginService.getUserById(0)).thenReturn(Optional.of(user));
 
         MockHttpServletRequest request = new MockHttpServletRequest();
@@ -99,9 +94,7 @@ public class ReviewServiceTest {
         // Attributes for review
         String text = "My first drinking fountain review";
         int stars = 4;
-        List<String> stringList = new ArrayList<>();
         DrinkingFountainEntity.FountainType type = DrinkingFountainEntity.FountainType.DRINKING;
-        String picture = "y4uwwrgwsfhgfieufgr73842ruegrewegfbtr7bhfduihffh";
         int drinkingFountainId = 0;
         ZonedDateTime specificCreatedAt = ZonedDateTime.parse("2023-01-01T00:00:00.000000+01:00[Europe/Copenhagen]");
 
@@ -128,8 +121,7 @@ public class ReviewServiceTest {
                     .build();
 
             // Adding a String to the list
-            stringList.add(picture);
-            ReviewRequestDTO reviewRequestDTO = new ReviewRequestDTO(text, stars, stringList, type, drinkingFountainId);
+            ReviewRequestDTO reviewRequestDTO = new ReviewRequestDTO(text, stars, type, drinkingFountainId);
             Mockito.when(loginService.getUserById(0)).thenReturn(Optional.of(user));
 
             DrinkingFountainEntity fountainEntity = DrinkingFountainEntity.builder()
@@ -145,19 +137,17 @@ public class ReviewServiceTest {
 
             Mockito.when(drinkingFountainRepository.findById(reviewRequestDTO.drinkingFountainId())).thenReturn(Optional.of(fountainEntity));
 
+            ReviewsScoreSumProjection mockedProjection = ReviewsScoreSumProjectionMock.createMock(6, 2);
+            Mockito.when(reviewRepository.getReviewSumAndCount(id)).thenReturn(mockedProjection);
+
             ReviewEntity reviewEntity = ReviewEntity.builder()
                     .text(reviewRequestDTO.text())
                     .stars(reviewRequestDTO.stars())
-                    .reviewImages(List.of())
                     .type(reviewRequestDTO.type())
                     .userEntity(user)
                     .createdAt(specificCreatedAt)
                     .drinkingFountain(fountainEntity)
                     .build();
-
-            List<ReviewImageEntity> reviewImageEntities = new ArrayList<>();
-            ReviewImageEntity reviewImageEntity = new ReviewImageEntity(id, Base64.getDecoder().decode(picture), specificCreatedAt, reviewEntity);
-            reviewImageEntities.add(reviewImageEntity);
 
             Mockito.when(reviewRepository.save(Mockito.any())).thenReturn(reviewEntity);
 
@@ -165,7 +155,6 @@ public class ReviewServiceTest {
             reviewService.addReview(reviewRequestDTO, request);
 
             Mockito.verify(reviewRepository, Mockito.times(1)).save(reviewEntity);
-            Mockito.verify(reviewImageRepository, Mockito.times(1)).saveAll(reviewImageEntities);
         }
     }
 }

@@ -136,7 +136,7 @@ public class DrinkingFountainServiceTest {
     }
 
     @Test
-    void drinkingFountainDTOMapperTest() {
+    void saveDrinkingFountainRequestTest() {
         //Attributes
         double latitude = 232.3232232;
         double longitude = 53463.3552;

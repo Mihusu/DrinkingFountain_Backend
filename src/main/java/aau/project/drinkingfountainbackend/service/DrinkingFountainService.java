@@ -55,7 +55,6 @@ public class DrinkingFountainService {
                 .score(drinkingFountainRequestDTO.score())
                 .createdAt(ZonedDateTime.now())
                 .approved(false)
-                .score(drinkingFountainRequestDTO.score())
                 .build()
         );
 
@@ -68,7 +67,6 @@ public class DrinkingFountainService {
         reviewService.addReview(new ReviewRequestDTO(
                 drinkingFountainRequestDTO.review(),
                 drinkingFountainRequestDTO.score(),
-                List.of(),
                 drinkingFountainRequestDTO.type(),
                 savedDrinkingFountain.getId()
         ), httpServletRequest);
@@ -88,17 +86,12 @@ public class DrinkingFountainService {
     }
 
     private DrinkingFountainDTO drinkingFountainDTOMapper(DrinkingFountainEntity entity) {
-        List<ReviewDTO> reviewDTOS = entity.getReviewEntities().stream().map(reviewEntity -> {
-            List<ReviewImageDTO> reviewImages = reviewEntity.getReviewImages().stream().map(
-                    reviewImageEntity -> new ReviewImageDTO(Base64Utility.encode(reviewImageEntity.getImage()))).toList();
-            return new ReviewDTO(
-                    reviewEntity.getText(),
-                    reviewEntity.getStars(),
-                    reviewImages,
-                    reviewEntity.getType(),
-                    reviewEntity.getUserEntity().getName(),
-                    reviewEntity.getCreatedAt());
-        }).toList();
+        List<ReviewDTO> reviewDTOS = entity.getReviewEntities().stream().map(reviewEntity -> new ReviewDTO(
+                reviewEntity.getText(),
+                reviewEntity.getStars(),
+                reviewEntity.getType(),
+                reviewEntity.getUserEntity().getName(),
+                reviewEntity.getCreatedAt())).toList();
 
         List<FountainImageDTO> fountainImageDTOS = entity.getFountainImageEntities().stream().map(
                 //Turn each entity into a DTO
@@ -128,4 +121,5 @@ public class DrinkingFountainService {
     private FountainListViewDTO fountainListViewDTOMapper(DrinkingFountainListViewProjection projection) {
         return new FountainListViewDTO(projection.getId(), projection.getDistance(), projection.getLatitude(), projection.getLongitude(), projection.getType(), projection.getScore());
     }
+
 }

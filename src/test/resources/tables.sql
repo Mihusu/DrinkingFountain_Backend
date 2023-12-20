@@ -32,25 +32,9 @@ CREATE TABLE reviews (
     created_at TIMESTAMP WITH TIME ZONE NOT NULL -- Timestamp indicating when the review was created, defaults to current timestamp
 );
 
-CREATE TABLE review_images (
-    review_images_id SERIAL PRIMARY KEY, -- Auto-incrementing unique identifier for each review image
-    image BYTEA NOT NULL, -- Storing the images of a drinking fountain, cannot be NULL
-    review_id SERIAL REFERENCES reviews(review_id), -- Unique identifier that comes from the reviews table as a foreign key
-    created_at TIMESTAMP WITH TIME ZONE NOT NULL -- Timestamp indicating when the review_images was created, defaults to current timestamp
-);
-
 CREATE TABLE fountain_images (
     fountain_images_id SERIAL PRIMARY KEY, -- Auto-incrementing unique identifier for each fountain image
     image BYTEA NOT NULL, -- Storing the images of a drinking fountain, cannot be NULL
     drinking_fountain_id SERIAL REFERENCES drinking_fountains(drinking_fountain_id), -- Unique identifier that comes from the drinking_fountain table as a foreign key
     created_at TIMESTAMP WITH TIME ZONE NOT NULL -- Timestamp indicating when the fountain_images was created, defaults to current timestamp
-);
-
-CREATE TABLE fountain_change_requests (
-    drinking_fountain_change_request_id SERIAL PRIMARY KEY, -- Auto-incrementing unique identifier for each user
-    image BYTEA NOT NULL, -- Storing the images of a drinking fountain, cannot be NULL
-    drinking_fountain_id SERIAL REFERENCES drinking_fountains(drinking_fountain_id), -- Unique identifier that comes from the drinking_fountain table as a foreign key
-    longitude DOUBLE PRECISION NOT NULL, -- Longitude coordinate of a drinking fountain, cannot be NULL
-    latitude DOUBLE PRECISION NOT NULL, -- Latitude coordinate of a drinking fountain, cannot be NULL
-    created_at TIMESTAMP WITH TIME ZONE NOT NULL -- Timestamp indicating when the fountain change request was created, defaults to current timestamp
 );
